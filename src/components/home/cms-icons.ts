@@ -1,0 +1,36 @@
+import {
+  Globe2,
+  ShoppingBag,
+  Code2,
+  Search,
+  RefreshCw,
+  ServerCog,
+  Target,
+  PenTool,
+  Smartphone,
+  Gauge,
+  LifeBuoy,
+  Rocket,
+  CalendarDays,
+  Layers3,
+  Route,
+} from "lucide-react";
+export const cmsIcons = {
+  Globe2,
+  ShoppingBag,
+  Code2,
+  Search,
+  RefreshCw,
+  ServerCog,
+  Target,
+  PenTool,
+  Smartphone,
+  Gauge,
+  LifeBuoy,
+  Rocket,
+  CalendarDays,
+  Layers3,
+  Route,
+};
+export const cmsIcon = (name: string) =>
+  cmsIcons[name.replace(/^Lucide/, "") as keyof typeof cmsIcons] || Globe2;
