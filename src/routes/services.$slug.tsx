@@ -2,6 +2,7 @@
 import { ServiceDetailPage } from "@/components/services/services-page";
 import { services, serviceFaqs } from "@/data/services";
 import { seo } from "@/lib/seo";
+import { serviceCopy } from "@/data/service-copy";
 export const Route = createFileRoute("/services/$slug")({
   loader: ({ params }) => {
     const service = services.find((s) => s.slug === params.slug);
@@ -11,7 +12,7 @@ export const Route = createFileRoute("/services/$slug")({
   head: ({ loaderData }) => {
     const s = services.find((s) => s.slug === loaderData?.slug);
     return s
-      ? seo(s.title, s.description, `/services/${s.slug}`, [
+      ? seo(s.title, serviceCopy[s.slug]?.description || s.description, `/services/${s.slug}`, [
           {
             "@type": "Service",
             name: s.title,

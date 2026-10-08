@@ -4,7 +4,7 @@ import { seo } from "@/lib/seo";
 export const Route = createFileRoute("/blog/")({
   head: () =>
     seo(
-      "Insights & Ideas",
+      "Website Design, E-Commerce & SEO Insights",
       "Practical Webakoof articles on planning better websites, e-commerce experiences and useful digital measurement.",
       "/blog",
     ),

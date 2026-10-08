@@ -1,59 +1,166 @@
 ﻿import { Action, CTA, Heading, InnerHero } from "@/components/shared/page";
-import workspace from "@/assets/webakoof-hero-workspace.jpg";
+import { Building2, Rocket, ChartNoAxesCombined, Eye, Target, ArrowUpRight } from "lucide-react";
 export function AboutPage() {
   return (
     <>
       <InnerHero
+        className="about-breadcrumb-hero"
         label="About Webakoof"
         title="We combine creativity, technology & business thinking."
         description="Webakoof is the web and digital technology division of Praavi Consultants. We connect business understanding with thoughtful digital execution."
-      >
-        <div className="about-monogram">
-          <span>STRATEGY × DESIGN × TECHNOLOGY</span>
-          <strong>w.</strong>
-          <p>
-            One focused team.
-            <br />
-            Every digital detail.
-          </p>
-        </div>
-      </InnerHero>
-      <section className="section-space story-section">
-        <div className="section-shell story-grid">
-          <div>
-            <p className="eyebrow">01 / OUR STORY</p>
-            <h2>
-              Good work starts
-              <br />
-              with better questions.
+      />
+      <section className="journey-section" aria-labelledby="journey-heading">
+        <div className="section-shell journey-grid">
+          <div className="journey-copy">
+            <p className="eyebrow">ABOUT WEBAKOOF</p>
+            <h2 id="journey-heading">
+              Our <span>Journey</span>
             </h2>
-            <p>
-              What does your business need to achieve? What stands in your customer’s way? And where
-              can technology make a useful difference?
+            <p className="journey-description">
+              Webakoof is a dedicated web development brand by Praavi Consultants. What started as a
+              web development service within Praavi Consultants grew into a separate brand over 2
+              years ago, focused on modern, user-friendly and performance-driven websites. Founded
+              by Pooja Pandey and Malhar Pandey, Webakoof delivers business websites, e-commerce
+              platforms, custom web applications and SEO solutions for brands across industries.
             </p>
-            <p>
-              These questions shape the way we work. Under Praavi Consultants, Webakoof brings
-              website development and digital marketing into one considered process, from the first
-              conversation through launch and ongoing improvement.
-            </p>
-            <p>
-              We believe a website should be more than a finished design. It should be a useful part
-              of how your business communicates, operates and grows.
-            </p>
+            <ol className="journey-timeline">
+              {[
+                {
+                  icon: Building2,
+                  title: "Rooted in Praavi Consultants",
+                  text: "Web development started as a service within Praavi.",
+                },
+                {
+                  icon: Rocket,
+                  title: "2+ Years Ago",
+                  text: "Webakoof was established as a separate brand.",
+                },
+                {
+                  icon: ChartNoAxesCombined,
+                  title: "Today",
+                  text: "Delivering digital solutions for businesses of all sizes.",
+                },
+              ].map(({ icon: Icon, title, text }) => (
+                <li key={title}>
+                  <span className="journey-milestone-icon">
+                    <Icon size={28} strokeWidth={1.8} aria-hidden="true" />
+                  </span>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-          <figure className="story-image">
+          <div className="journey-portrait">
+            <div className="journey-yellow-orbit" aria-hidden="true" />
             <img
-              src={workspace}
-              alt="Digital workspace illustration with website layouts and development tools"
-              width={1408}
-              height={1008}
+              src="/webakoof_ceo.png"
+              alt="Pooja Pandey, co-founder of Webakoof, at her workspace"
+              width={1145}
+              height={1374}
               loading="lazy"
             />
-            <figcaption>A connected view of design, technology and business.</figcaption>
-          </figure>
+            <figure className="journey-quote">
+              <span className="journey-quote-mark" aria-hidden="true">
+                &ldquo;
+              </span>
+              <blockquote>Building web solutions that help businesses grow.</blockquote>
+              <figcaption>
+                <strong>POOJA PANDEY</strong>
+                <span>Co-Founder &middot; Webakoof</span>
+              </figcaption>
+            </figure>
+          </div>
         </div>
-        <div className="background-word" aria-hidden="true">
-          WEBAKOOF
+      </section>
+      <section className="section-space vision-mission-section" aria-label="Our vision and mission">
+        <div className="section-shell vision-mission-grid">
+          {[
+            {
+              icon: Eye,
+              label: "WHERE WE WANT TO GO",
+              title: "Our Vision",
+              text: "To help businesses grow through thoughtful digital experiences that bring together creativity, technology and real business needs.",
+              note: "A clearer digital future for every business.",
+            },
+            {
+              icon: Target,
+              label: "WHAT DRIVES US EVERY DAY",
+              title: "Our Mission",
+              text: "To build modern, user-friendly websites and digital solutions that make it easier for businesses to connect with customers, simplify their work and grow with confidence.",
+              note: "Purpose in every page. Care in every detail.",
+            },
+          ].map(({ icon: Icon, label, title, text, note }, index) => (
+            <article
+              className={`vision-mission-card ${index === 1 ? "mission-card" : "vision-card"}`}
+              key={title}
+            >
+              <div className="vision-mission-top">
+                <span className="vision-mission-icon">
+                  <Icon size={34} strokeWidth={1.6} aria-hidden="true" />
+                </span>
+                <span className="vision-mission-index">0{index + 1}</span>
+              </div>
+              <p className="vision-mission-label">{label}</p>
+              <h2>{title}</h2>
+              <p className="vision-mission-copy">{text}</p>
+              <div className="vision-mission-note">
+                <span>{note}</span>
+                <ArrowUpRight size={22} aria-hidden="true" />
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="section-space team-section" aria-labelledby="team-heading">
+        <div className="section-shell">
+          <div className="team-heading">
+            <p className="eyebrow">THE PEOPLE BEHIND THE WORK</p>
+            <h2 id="team-heading">
+              Our <span>Team</span>
+            </h2>
+            <p>
+              A dedicated team bringing care, creativity and technical expertise to every project.
+            </p>
+          </div>
+          <div className="team-grid">
+            {[
+              { name: "Prajakata Inamke", role: "Head Of Webakoof", photo: "/Prajakta-clean.png" },
+              {
+                name: "Abhishek Jambhale",
+                role: "Senior Web Developer",
+                photo: "/abhishek-clean.png",
+              },
+              {
+                name: "Vaishnavi Pawar",
+                role: "Senior Web Developer",
+                photo: "/vaishnavi-clean.png",
+              },
+              { name: "Bhushan Wagh", role: "Junior Web Developer", photo: "/bhushan-clean.png" },
+              {
+                name: "Priyanka Katore",
+                role: "Junior Web Developer",
+                photo: "/priyanka-clean.png",
+              },
+              { name: "Bipin Mandal", role: "Junior Web Developer", photo: "/bipin-clean.png" },
+            ].map(({ name, role, photo }) => (
+              <article className="team-card" key={name}>
+                <div className="team-photo">
+                  <img
+                    src={photo}
+                    alt={`${name}, ${role}`}
+                    width={600}
+                    height={720}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="team-card-info">
+                  <h3>{name}</h3>
+                  <p>{role}</p>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
       <section className="section-space surface">
@@ -80,60 +187,6 @@ export function AboutPage() {
             ].map(([title, text], i) => (
               <article key={title}>
                 <span>0{i + 1}</span>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className="section-space">
-        <div className="section-shell relationship-grid">
-          <Heading
-            label="03 / THE BIGGER PICTURE"
-            title="Business perspective. Digital capability."
-            text="Our connection to Praavi Consultants keeps business thinking close to the work. Webakoof translates that perspective into websites and digital solutions."
-          />
-          <div className="relationship">
-            {[
-              ["Praavi Consultants", "Business perspective"],
-              ["Webakoof", "Web & digital technology division"],
-              ["Web & Digital Solutions", "Design · Development · Growth"],
-            ].map(([title, text]) => (
-              <div key={title}>
-                <h3>{title}</h3>
-                <p>{text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className="section-space surface">
-        <div className="section-shell">
-          <div className="section-top">
-            <Heading
-              label="04 / HOW WE WORK TOGETHER"
-              title="Different disciplines. One shared direction."
-            />
-            <p className="section-aside">
-              Your project brings together the capabilities it needs, with a clear scope and shared
-              checkpoints.
-            </p>
-          </div>
-          <div className="discipline-grid">
-            {[
-              ["01", "Strategy & discovery", "Listening, questioning and defining what matters."],
-              [
-                "02",
-                "Design & experience",
-                "Turning a clear direction into an intuitive interface.",
-              ],
-              ["03", "Development & growth", "Building, testing and improving the experience."],
-            ].map(([num, title, text]) => (
-              <article key={num}>
-                <div className="discipline-art" aria-hidden="true">
-                  <span>{num}</span>
-                </div>
                 <h3>{title}</h3>
                 <p>{text}</p>
               </article>

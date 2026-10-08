@@ -10,8 +10,8 @@ export const Route = createFileRoute("/portfolio/")({
   }),
   head: () =>
     seo(
-      "Portfolio & Design Concepts",
-      "Explore Webakoof design concepts across e-commerce, healthcare and corporate websites, with a closer look at the thinking behind each experience.",
+      "Website Development Portfolio & Projects",
+      "Explore Webakoof website projects across healthcare, education, jewellery, e-commerce and business services. View designs, demos and project details.",
       "/portfolio",
     ),
   component: PortfolioPage,

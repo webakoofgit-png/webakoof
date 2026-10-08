@@ -107,9 +107,9 @@ export const settingsDefaults = {
   phone: "",
   whatsapp: "",
   address: "",
-  instagram: "",
-  facebook: "",
-  linkedin: "",
+  instagram: "https://www.instagram.com/webakooflabs",
+  facebook: "https://www.facebook.com/share/1BfQR4cyDY/",
+  linkedin: "https://www.linkedin.com/company/webakoof-labs/",
   youtube: "",
   metaTitle: "Websites, Technology & Digital Growth",
   metaDescription:

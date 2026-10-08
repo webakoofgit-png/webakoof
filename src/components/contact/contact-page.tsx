@@ -81,6 +81,7 @@ export function ContactPage() {
   return (
     <>
       <InnerHero
+        className="contact-breadcrumb-hero"
         label="Let’s work together"
         title="Have an idea? Let’s turn it into something powerful."
         description="A new website, a better online store or a digital challenge you haven’t quite defined. Tell us what you have in mind."

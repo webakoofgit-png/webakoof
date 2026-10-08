@@ -12,7 +12,7 @@ export const Route = createFileRoute("/portfolio/$slug")({
   head: ({ loaderData: p }) =>
     p
       ? seo(
-          p.metaTitle || `${p.name} — Design Case Study`,
+          p.metaTitle || `${p.name} — Website Design Portfolio`,
           p.metaDescription || p.description,
           `/portfolio/${p.slug}`,
           undefined,

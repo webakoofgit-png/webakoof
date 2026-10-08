@@ -2,6 +2,7 @@
   import.meta.env["VITE_SITE_URL"] || "https://webakoof-growth-hub.lovable.app"
 ).replace(/\/$/, "");
 export const absoluteUrl = (path: string) => new URL(path, origin).href;
+export const siteOrigin = origin;
 export function seo(
   title: string,
   description: string,
@@ -13,6 +14,7 @@ export function seo(
     meta: [
       { title: `${title} | Webakoof` },
       { name: "description", content: description },
+      { name: "robots", content: "index, follow, max-image-preview:large" },
       { property: "og:title", content: `${title} | Webakoof` },
       { property: "og:description", content: description },
       { property: "og:url", content: absoluteUrl(path) },
@@ -35,6 +37,20 @@ export function seo(
               name: "Webakoof",
               url: origin,
               parentOrganization: { "@type": "Organization", name: "Praavi Consultants" },
+            },
+            {
+              "@type": "WebSite",
+              "@id": `${origin}/#website`,
+              name: "Webakoof",
+              url: origin,
+            },
+            {
+              "@type": "WebPage",
+              url: absoluteUrl(path),
+              name: title,
+              description,
+              inLanguage: "en",
+              isPartOf: { "@id": `${origin}/#website` },
             },
             {
               "@type": "BreadcrumbList",

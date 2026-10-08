@@ -137,6 +137,7 @@ export function PortfolioPage() {
   return (
     <>
       <InnerHero
+        className="portfolio-breadcrumb-hero"
         label="Selected work"
         title="Projects built to solve real business problems."
         description="A closer look at digital experiences across industries, from published websites to considered design concepts."

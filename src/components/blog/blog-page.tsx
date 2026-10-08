@@ -93,6 +93,7 @@ export function BlogPage() {
   return (
     <>
       <InnerHero
+        className="blog-breadcrumb-hero"
         label="Insights & ideas"
         title="Ideas that help businesses grow digitally."
         description="Practical thinking on better websites, clearer experiences and the decisions behind digital growth."

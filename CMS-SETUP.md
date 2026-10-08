@@ -97,3 +97,8 @@ Owner-provided screenshots and MP4 recordings live in `public/projects/`. `scrip
 Review imported drafts in **Admin > Portfolio**, supply the correct category, live Website URL, service and short description, then publish. The eye icon previews draft case studies, including their video. Recordings are editable under **Media > Showcase Video URL**. Videos appear in the case study preview section with playback controls; portfolio cards retain their screenshot layout.
 
 Rent for Health is the final name of the project previously labelled Sahyadri Surgical. Its screenshot is `Rent For health.png` and its recording is `rent for health.mp4`; both belong to the single `rent-for-health` project.
+# Search engine setup
+
+Set `VITE_SITE_URL` to the final HTTPS website origin before building for production. Canonical URLs, social sharing URLs, `/sitemap.xml` and the sitemap declaration in `/robots.txt` use this same origin.
+
+The XML sitemap includes public pages, six services, published portfolio projects and published blog articles. Drafts, future blog articles and admin/API routes are excluded. The footer links to the XML sitemap. Submit the production sitemap in Google Search Console after deployment; local development URLs cannot be indexed by Google.

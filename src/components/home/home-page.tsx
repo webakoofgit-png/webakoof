@@ -1,6 +1,15 @@
 import { BusinessCounters } from "./business-counters";
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, ArrowRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowRight,
+  PanelsTopLeft,
+  ShoppingCart,
+  Workflow,
+  ChartNoAxesCombined,
+  WandSparkles,
+  ShieldCheck,
+} from "lucide-react";
 import { Action, Heading, Process } from "@/components/shared/page";
 import heroWorkspace from "@/assets/hero-real-workspace.jpg";
 import { services } from "@/data/services";
@@ -9,6 +18,14 @@ import { homepageDefaults } from "@/lib/cms/defaults";
 import { cmsIcon } from "./cms-icons";
 import { reasons, technologies } from "./content";
 import { ProjectCard } from "@/components/portfolio/portfolio-page";
+const serviceCardIcons = {
+  "/services/website-development": PanelsTopLeft,
+  "/services/ecommerce-development": ShoppingCart,
+  "/services/custom-web-development": Workflow,
+  "/services/seo": ChartNoAxesCombined,
+  "/services/website-redesign": WandSparkles,
+  "/services/website-maintenance": ShieldCheck,
+};
 export function HomePage() {
   const content = useContent();
   const sections = { ...homepageDefaults, ...content.sections };
@@ -95,17 +112,22 @@ export function HomePage() {
           </div>
           <div className="service-preview-grid">
             {(homeServices || services.map((s) => ({ ...s, url: "/services/" + s.slug }))).map(
-              (s) => (
-                <a key={s.slug} href={s.url} className="service-preview">
-                  <div>
-                    <span>{s.number}</span>
-                    <s.icon size={26} />
-                  </div>
-                  <h3>{s.title}</h3>
-                  <p>{s.description}</p>
-                  <ArrowUpRight className="card-arrow" />
-                </a>
-              ),
+              (s) => {
+                const Icon = serviceCardIcons[s.url as keyof typeof serviceCardIcons] || s.icon;
+                return (
+                  <a key={s.slug} href={s.url} className="service-preview">
+                    <div>
+                      <span>{s.number}</span>
+                      <span className="service-icon-badge" aria-hidden="true">
+                        <Icon size={36} strokeWidth={1.7} />
+                      </span>
+                    </div>
+                    <h3>{s.title}</h3>
+                    <p>{s.description}</p>
+                    <ArrowUpRight className="card-arrow" />
+                  </a>
+                );
+              },
             )}
           </div>
         </div>

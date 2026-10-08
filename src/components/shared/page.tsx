@@ -34,15 +34,17 @@ export function InnerHero({
   description,
   children,
   parent,
+  className = "",
 }: {
   label: string;
   title: string;
   description: string;
   children?: ReactNode;
   parent?: { label: string; to: "/services" | "/portfolio" | "/blog" };
+  className?: string;
 }) {
   return (
-    <section className={`inner-hero ${children ? "has-visual" : ""}`}>
+    <section className={`inner-hero ${children ? "has-visual" : ""} ${className}`}>
       <div className="section-shell">
         <nav className="breadcrumbs" aria-label="Breadcrumb">
           <Link to="/">Home</Link>
