@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { InnerHero, Heading } from "@/components/shared/page";
 import { submitEnquiry } from "@/lib/enquiry";
+import { notifyContactEmail } from "@/lib/web3forms";
 import { useContent } from "@/lib/cms/context";
 import {
   enquiryServices,
@@ -55,10 +56,28 @@ export function ContactPage() {
           website: value("website"),
         },
       });
-      setStatus(result);
       if (result.ok) {
+        try {
+          await notifyContactEmail(
+            Object.fromEntries(
+              ["name", "business", "phone", "email", "service", "budget", "message"].map((key) => [
+                key,
+                value(key),
+              ]),
+            ),
+          );
+          setStatus(result);
+        } catch {
+          setStatus({
+            ok: true,
+            message:
+              "Your enquiry has been saved for our team. The email notification could not be delivered, but you do not need to submit again.",
+          });
+        }
         form.reset();
         setBrief("");
+      } else {
+        setStatus(result);
       }
     } catch {
       setStatus({
