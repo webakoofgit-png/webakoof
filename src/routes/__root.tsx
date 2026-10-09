@@ -13,7 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Navbar, Footer } from "@/components/home/site-chrome";
-import { getPublicContent } from "@/lib/cms/public";
+import { getPublicContent, type PublicContent } from "@/lib/cms/public";
 import { ContentContext } from "@/lib/cms/context";
 
 function NotFoundComponent() {
@@ -38,7 +38,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -77,7 +77,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  beforeLoad: async ({ location }) => ({
+  beforeLoad: async ({ location }): Promise<{ content: PublicContent | null }> => ({
     content: location.pathname.startsWith("/admin") ? null : await getPublicContent(),
   }),
   head: ({ match }) => ({
