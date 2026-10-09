@@ -309,7 +309,6 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
                 muted
                 playsInline
                 preload="metadata"
-                controls
                 poster={p.desktopImage || p.image || undefined}
                 aria-label={`${p.name} scrolling website preview`}
               >
