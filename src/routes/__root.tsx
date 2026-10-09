@@ -94,7 +94,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
-      { rel: "icon", href: match.context.content?.settings.favicon || "/favicon.svg" },
+      {
+        rel: "icon",
+        href:
+          match.context.content?.settings.favicon &&
+          match.context.content.settings.favicon !== "/favicon.svg"
+            ? match.context.content.settings.favicon
+            : "/favicon.svg?v=webakoof-logo",
+      },
+      { rel: "apple-touch-icon", href: "/webakoof-logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
