@@ -4,10 +4,8 @@ import type { PublicContent } from "./public";
 import { cleanArticle } from "./rich-text.server";
 export async function loadPublicContent(): Promise<PublicContent> {
   if (!cmsEnabled()) {
-    const [{ projects }, { articles }] = await Promise.all([
-      import("@/data/projects"),
-      import("@/data/blog"),
-    ]);
+    const { projects } = await import("@/data/projects");
+    const articles: PublicContent["articles"] = [];
     return {
       projects,
       articles,
@@ -27,13 +25,15 @@ export async function loadPublicContent(): Promise<PublicContent> {
   }
   const [projects, articles, pc, bc, sections, settings] = await Promise.all([
     rows(
-      'SELECT p.content,c.name category,c.slug categorySlug FROM portfolio_projects p JOIN portfolio_categories c ON c.id=p.category_id WHERE p.status="published" ORDER BY p.created_at DESC',
+      'SELECT p.content,c.name category,c.slug categorySlug FROM portfolio_projects p JOIN portfolio_categories c ON c.id=p.category_id WHERE p.status="published" AND p.slug<>"aurora-botanics" ORDER BY p.created_at DESC',
     ),
     rows(
-      'SELECT p.content,c.name category FROM blog_posts p JOIN blog_categories c ON c.id=p.category_id WHERE p.status="published" AND p.publish_date<=UTC_DATE() ORDER BY p.publish_date DESC,p.id DESC',
+      'SELECT p.content,p.published_at,p.updated_at,c.name category FROM blog_posts p JOIN blog_categories c ON c.id=p.category_id WHERE p.status="published" AND p.publish_date<=UTC_DATE() ORDER BY p.publish_date DESC,p.id DESC',
     ),
     rows('SELECT name,slug FROM portfolio_categories WHERE status="active" ORDER BY name'),
-    rows('SELECT name FROM blog_categories WHERE status="active" ORDER BY name'),
+    rows(
+      'SELECT c.name FROM blog_categories c WHERE c.status="active" AND EXISTS (SELECT 1 FROM blog_posts p WHERE p.category_id=c.id AND p.status="published" AND p.publish_date<=UTC_DATE()) ORDER BY c.name',
+    ),
     rows("SELECT slug,content FROM homepage_sections"),
     rows("SELECT content FROM website_settings WHERE id=1"),
   ]);
@@ -49,6 +49,10 @@ export async function loadPublicContent(): Promise<PublicContent> {
         ...article,
         ...(article.html ? cleanArticle(article.html) : {}),
         category: String(a["category"]),
+        ...(a["published_at"]
+          ? { publishedAt: String(a["published_at"]).replace(" ", "T") + "Z" }
+          : {}),
+        updatedAt: String(a["updated_at"]).replace(" ", "T") + "Z",
       };
     }),
     portfolioCategories: pc.map((c) => String(c["name"])),

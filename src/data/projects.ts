@@ -1,4 +1,3 @@
-import aurora from "@/assets/project-aurora.jpg";
 import vertex from "@/assets/project-vertex.jpg";
 import northstar from "@/assets/project-northstar.jpg";
 import skincityDesktop from "@/assets/project-skincity-desktop.png";
@@ -76,28 +75,6 @@ export const projects: Project[] = [
     liveUrl: "https://rockals.in",
     isConcept: false,
     showcaseVideo: "/projects/rockals.mp4",
-  },
-  {
-    slug: "aurora-botanics",
-    name: "Aurora Botanics",
-    industry: "E-Commerce",
-    image: aurora,
-    service: "Storefront & conversion design",
-    tags: ["WooCommerce", "UI/UX"],
-    description: "A considered shopping experience for a botanical skincare brand.",
-    challenge:
-      "Make a broad product range feel easy to explore without losing the quiet character of the brand.",
-    approach:
-      "Organise discovery around customer needs, then give product information room to breathe.",
-    solution:
-      "An editorial storefront concept with product-led navigation and a clear route to checkout.",
-    features: [
-      "Product collections",
-      "Responsive product cards",
-      "Brand storytelling",
-      "Clear purchase journey",
-    ],
-    services: ["website-development", "ecommerce-development", "website-redesign"],
   },
   {
     slug: "vertex-health",

@@ -52,6 +52,7 @@ const blogDefaults = {
   metaTitle: "",
   metaDescription: "",
   focusKeyword: "",
+  secondaryKeywords: "",
   ogImage: "",
   sections: [],
   art: "website",
@@ -147,6 +148,7 @@ function Editor({
       <div className="adm-form-grid">
         {input("metaTitle", "SEO / Meta Title")}
         {input("focusKeyword", "Focus Keyword")}
+        {kind === "blogs" && input("secondaryKeywords", "Secondary Keywords (comma separated)")}
         {area("metaDescription", "Meta Description")}
         {image("ogImage", "Open Graph Image")}
       </div>
@@ -291,7 +293,11 @@ function Editor({
               ) : (
                 <>
                   {input("author", "Author")}
-                  {input("date", "Publish Date *", "date", true)}
+                  {input("date", "Editorial Display Date *", "date", true)}
+                  <p className="adm-help">
+                    The display date orders articles. Actual publication timestamps are recorded
+                    automatically when you publish.
+                  </p>
                 </>
               )}
             </div>

@@ -26,6 +26,10 @@ export type PublicContent = {
     image?: string;
     imageAlt?: string;
     html?: string;
+    publishedAt?: string;
+    updatedAt?: string;
+    focusKeyword?: string;
+    secondaryKeywords?: string;
     author?: string;
     metaTitle?: string;
     metaDescription?: string;

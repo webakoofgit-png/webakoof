@@ -212,6 +212,7 @@ test("login UI, project edit tabs, blog editor, and dashboard render", async ({ 
   await expect(page.getByRole("heading", { name: "Welcome back to WEBakoof." })).toBeVisible();
   await page.screenshot({ path: "qa-artifacts/admin-dashboard.png", fullPage: true });
   await page.goto("/admin/portfolio");
+  await page.getByLabel("Search content").fill("Rockals");
   await expect(page.getByText("Rockals", { exact: true })).toBeVisible();
   await page
     .locator("tr")

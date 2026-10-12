@@ -14,7 +14,7 @@ const metrics = [
   },
   {
     icon: CalendarDays,
-    value: 2,
+    value: 4,
     suffix: "+",
     title: "Years of Experience",
     description: "Practical expertise, every step.",

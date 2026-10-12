@@ -76,7 +76,13 @@ export const blogSchema = z.object({
   slug,
   category_id: z.coerce.number().int().positive(),
   status: z.enum(["draft", "published"]),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .refine((value) => {
+      const date = new Date(value + "T00:00:00Z");
+      return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+    }, "Choose a valid calendar date."),
   excerpt: text.default(""),
   image: url.default(""),
   imageAlt: text.default(""),
@@ -85,6 +91,7 @@ export const blogSchema = z.object({
   metaTitle: text.default(""),
   metaDescription: text.default(""),
   focusKeyword: text.default(""),
+  secondaryKeywords: text.default(""),
   ogImage: url.default(""),
   art: text.default("website"),
   quote: text.default(""),

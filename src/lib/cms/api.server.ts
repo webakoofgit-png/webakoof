@@ -1,6 +1,4 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { mkdir, writeFile, unlink } from "node:fs/promises";
-import { resolve } from "node:path";
 import { cleanArticle } from "./rich-text.server";
 import { z } from "zod";
 import { database, rows, json } from "./db.server";
@@ -200,9 +198,24 @@ export async function api(request: Request) {
     } else {
       const d = kind === "portfolio" ? projectSchema.parse(input) : blogSchema.parse(input);
       if ("html" in d) Object.assign(d, cleanArticle(d.html));
+      if ("html" in d) {
+        const plain = d.html.replace(/<[^>]*>/g, " ").replace(/&[a-z0-9#]+;/gi, " ");
+        d.readTime = `${Math.max(1, Math.ceil(plain.trim().split(/\s+/).length / 200))} min read`;
+        if (d.status === "published" && !plain.trim())
+          throw new HttpError(400, "Add article content before publishing.");
+      }
       const connection = await database().getConnection();
       try {
         await connection.beginTransaction();
+        let previousSlug: string | undefined;
+        if (kind === "blogs" && id) {
+          const [existing] = await connection.execute(
+            "SELECT slug FROM blog_posts WHERE id=? FOR UPDATE",
+            [validId(id)],
+          );
+          previousSlug = (existing as { slug: string }[])[0]?.slug;
+          if (!previousSlug) throw new HttpError(404, "This article no longer exists.");
+        }
         const columns =
           "category_id,slug,status," +
           (kind === "portfolio" ? "name,featured" : "title,publish_date") +
@@ -225,6 +238,22 @@ export async function api(request: Request) {
           [...values, ...(id ? [validId(id)] : [])],
         );
         const recordId = id ? validId(id) : (result as { insertId: number }).insertId;
+        if (kind === "blogs" && d.status === "published")
+          await connection.execute(
+            "UPDATE blog_posts SET published_at=COALESCE(published_at,UTC_TIMESTAMP()) WHERE id=?",
+            [recordId],
+          );
+        if (kind === "blogs" && previousSlug && previousSlug !== d.slug) {
+          await connection.execute("DELETE FROM blog_redirects WHERE old_slug=?", [d.slug]);
+          await connection.execute("UPDATE blog_redirects SET new_slug=? WHERE new_slug=?", [
+            d.slug,
+            previousSlug,
+          ]);
+          await connection.execute(
+            "INSERT INTO blog_redirects(old_slug,new_slug) VALUES (?,?) ON DUPLICATE KEY UPDATE new_slug=VALUES(new_slug)",
+            [previousSlug, d.slug],
+          );
+        }
         if ("gallery" in d) {
           await connection.execute("DELETE FROM portfolio_project_images WHERE project_id=?", [
             recordId,
@@ -328,13 +357,11 @@ async function upload(request: Request) {
   if (!extension || !/\.(jpe?g|png|webp)$/i.test(file.name))
     throw new HttpError(400, "Only JPG, PNG and WebP images are supported.");
   const filename = randomUUID() + "." + extension;
-  const directory = resolve(process.env["UPLOAD_DIR"] || "uploads", folder);
-  const path = resolve(directory, filename);
   const url = `/uploads/${folder}/${filename}`;
-  await mkdir(directory, { recursive: true });
-  await writeFile(path, bytes, { flag: "wx" });
+  const connection = await database().getConnection();
   try {
-    await database().execute(
+    await connection.beginTransaction();
+    const [mediaResult] = await connection.execute(
       "INSERT INTO media(filename,path,url,alt_text,mime_type,size) VALUES (?,?,?,?,?,?)",
       [
         filename,
@@ -345,9 +372,16 @@ async function upload(request: Request) {
         bytes.length,
       ],
     );
+    await connection.execute("INSERT INTO media_blobs(media_id,bytes) VALUES (?,?)", [
+      (mediaResult as { insertId: number }).insertId,
+      bytes,
+    ]);
+    await connection.commit();
   } catch (e) {
-    await unlink(path);
+    await connection.rollback();
     throw e;
+  } finally {
+    connection.release();
   }
   return reply({ url });
 }

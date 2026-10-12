@@ -9,7 +9,7 @@ The existing TanStack Start application now includes a MySQL-backed admin at `/a
 - Login credentials: `.local/admin-login.txt` (ignored by Git).
 - MySQL Community 8.4.11: `.local/mysql/mysql-8.4.11-winx64`, listening only on `127.0.0.1:3307`.
 - Database: `webakoof`. Application credentials and session secret are in `.env`; the isolated database root password is in `.local/mysql/root-password.txt`.
-- Uploads: `uploads/`. Keep this directory and the database when restarting.
+- New uploads: stored in MySQL `media` + `media_blobs`. Keep the database when restarting; retain `uploads/` only for legacy filesystem images.
 
 Change the generated admin password in **Admin Profile** after signing in. `.local/admin-login.txt` records only the initial password.
 
@@ -35,17 +35,17 @@ Use the exact configured origin (`127.0.0.1`, not `localhost`) for admin writes.
 2. Run `npm ci` and copy `.env.example` to `.env`.
 3. Set `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `APP_ORIGIN`, and a random `SESSION_SECRET` of at least 32 characters. Use `DB_SSL=true` for a remote database with a trusted TLS certificate.
 4. Keep `CMS_ENABLED=false` while preparing the database.
-5. Run `npm run cms:seed`. This creates the schema, imports and verifies the existing five projects and three blogs, copies bundled images into `public/cms-seed`, and seeds actual homepage sections and settings. Re-running preserves existing CMS edits.
+5. Run `npm run cms:seed`. This creates the schema, imports the bundled projects, copies bundled images into `public/cms-seed`, and seeds homepage sections and settings. Re-running preserves existing CMS edits. Import blogs separately using `node --env-file=.env --import tsx scripts/import-blogs.ts --apply`; see `BLOG-DEPLOYMENT.md` for the safe existing-production upgrade.
 6. Set `ADMIN_NAME`, `ADMIN_EMAIL`, and a unique `ADMIN_PASSWORD` of at least 12 characters locally; run `npm run cms:admin`. Remove `ADMIN_PASSWORD` from the environment afterward.
 7. Set `CMS_ENABLED=true`, restart the application, and verify public pages and admin login.
 
 The seed requires CREATE/ALTER/INDEX/REFERENCES privileges. The runtime user needs SELECT/INSERT/UPDATE/DELETE only. The setup command creates tables inside the configured database; it does not provision a hosted database or modify existing accounts.
 
-The legacy TypeScript content files are intentionally retained as migration inputs and an explicit rollback mode. With `CMS_ENABLED=true`, projects, blog posts, categories, homepage sections and settings load from MySQL. An empty CMS stays empty; it does not silently republish static content. CMS failures do not fall back to stale static content.
+Legacy TypeScript content files remain as migration/comparison inputs. With `CMS_ENABLED=true`, projects, blog posts, categories, homepage sections and settings load from MySQL. An empty CMS stays empty; it does not silently republish static content. Blog pages do not show demo records when CMS is disabled. CMS failures do not fall back to stale static content.
 
 ## Deployment
 
-This CMS uses the **Node server Nitro preset**, MySQL TCP connections and a persistent filesystem for uploaded media. Deploy on a Node host/VPS with a persistent `UPLOAD_DIR`, or adapt the media repository to object storage before deploying to an ephemeral filesystem. A static-only or default Cloudflare/Lovable deployment is not configured to run this MySQL/filesystem backend.
+This CMS uses the **Node server Nitro preset**, MySQL TCP connections and persistent MySQL storage for new uploaded media. Legacy filesystem images need a persistent `UPLOAD_DIR` or a one-time byte migration. A static-only deployment cannot run the MySQL backend. See `BLOG-DEPLOYMENT.md` for Hostinger migration order.
 
 ```sh
 npm run typecheck

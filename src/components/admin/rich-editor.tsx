@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { ImageField } from "./shared";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 export function RichEditor({
   value,
   onChange,
@@ -10,6 +10,7 @@ export function RichEditor({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const [imageAlt, setImageAlt] = useState("");
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] }, link: { openOnClick: false } }),
@@ -63,12 +64,16 @@ export function RichEditor({
       <EditorContent editor={editor} />
       <details>
         <summary>Add an image to the article</summary>
+        <label className="adm-field">
+          Image description (alt text)
+          <input value={imageAlt} onChange={(e) => setImageAlt(e.target.value)} />
+        </label>
         <ImageField
           label="Article image"
           folder="blog"
           value=""
           onChange={(src) => {
-            if (src) editor.chain().focus().setImage({ src, alt: "Article illustration" }).run();
+            if (src) editor.chain().focus().setImage({ src, alt: imageAlt }).run();
           }}
         />
       </details>

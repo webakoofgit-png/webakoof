@@ -11,6 +11,8 @@ export default tseslint.config(
       "dist",
       ".output",
       ".vinxi",
+      ".vercel",
+      ".nitro",
       ".npm-cache",
       ".wrangler",
       "qa-artifacts",

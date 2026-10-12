@@ -9,8 +9,15 @@ export const Route = createFileRoute("/uploads/$")({
         const { readFile } = await import("node:fs/promises");
         const { resolve } = await import("node:path");
         try {
-          const bytes = await readFile(resolve(process.env["UPLOAD_DIR"] || "uploads", path));
-          return new Response(bytes, {
+          const { rows } = await import("@/lib/cms/db.server");
+          const records = await rows<{ bytes: Buffer }>(
+            "SELECT f.bytes FROM media_blobs f JOIN media m ON m.id=f.media_id WHERE m.path=?",
+            [path],
+          );
+          const bytes =
+            records[0]?.bytes ||
+            (await readFile(resolve(process.env["UPLOAD_DIR"] || "uploads", path)));
+          return new Response(new Uint8Array(bytes), {
             headers: {
               "Content-Type": path.endsWith(".jpg")
                 ? "image/jpeg"

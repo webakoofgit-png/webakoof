@@ -4,7 +4,8 @@ export const cmsEnabled = () => process.env["CMS_ENABLED"] === "true";
 export function database() {
   if (!process.env["DB_NAME"] || !process.env["DB_USER"])
     throw new Error("MySQL is not configured. Follow CMS-SETUP.md.");
-  return (pool ??= mysql.createPool({
+  if (pool) return pool;
+  pool = mysql.createPool({
     host: process.env["DB_HOST"] || "127.0.0.1",
     port: Number(process.env["DB_PORT"] || 3306),
     database: process.env["DB_NAME"],
@@ -15,7 +16,11 @@ export function database() {
     dateStrings: true,
     charset: "utf8mb4",
     ...(process.env["DB_SSL"] === "true" ? { ssl: { rejectUnauthorized: true } } : {}),
-  }));
+  });
+  pool.on("connection", (connection) => {
+    connection.query("SET time_zone = '+00:00'");
+  });
+  return pool;
 }
 export async function rows<T = Record<string, unknown>>(
   sql: string,

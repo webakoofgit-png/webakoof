@@ -1,5 +1,7 @@
 # Photography sources
 
+Blog photos in `public/blog-images/` are copies of the licensed website-development, e-commerce, custom-development, redesign and analytics assets listed below. They are illustrative stock photos, not evidence of client results or photographs of Webakoof staff.
+
 Service foundation photos are illustrative stock photos, saved locally at 1200 x 750 pixels. License: https://unsplash.com/license.
 
 - `src/assets/service-website-development.jpg`: Christopher Gower, coding workspace. Source image: https://images.unsplash.com/photo-1498050108023-c5249f4df085

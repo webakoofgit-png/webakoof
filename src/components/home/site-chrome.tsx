@@ -1,5 +1,5 @@
 ﻿import { useInteractive } from "@/hooks/use-interactive";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, ChevronDown, Menu, Facebook, Instagram, Linkedin } from "lucide-react";
 import { services } from "@/data/services";
@@ -55,6 +55,25 @@ export function Navbar() {
   const interactive = useInteractive();
   const [open, setOpen] = useState(false);
   const [mega, setMega] = useState(false);
+  const menuCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelMenuClose = () => {
+    if (menuCloseTimer.current !== null) clearTimeout(menuCloseTimer.current);
+    menuCloseTimer.current = null;
+  };
+  const openServices = () => {
+    cancelMenuClose();
+    setMega(true);
+  };
+  const scheduleMenuClose = () => {
+    cancelMenuClose();
+    menuCloseTimer.current = setTimeout(() => setMega(false), 250);
+  };
+  useEffect(
+    () => () => {
+      if (menuCloseTimer.current !== null) clearTimeout(menuCloseTimer.current);
+    },
+    [],
+  );
   const [scrolled, setScrolled] = useState(false);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   useEffect(() => {
@@ -77,8 +96,8 @@ export function Navbar() {
             <div
               key={path}
               className="nav-entry"
-              onMouseEnter={() => path === "/services" && setMega(true)}
-              onMouseLeave={() => setMega(false)}
+              onMouseEnter={() => (path === "/services" ? openServices() : setMega(false))}
+              onMouseLeave={() => path === "/services" && scheduleMenuClose()}
               onBlur={(e) => {
                 if (!e.currentTarget.contains(e.relatedTarget)) setMega(false);
               }}
@@ -106,7 +125,7 @@ export function Navbar() {
                     <ChevronDown size={14} />
                   </button>
                   {mega && (
-                    <div className="mega-menu" id="service-menu">
+                    <div className="mega-menu" id="service-menu" onMouseEnter={openServices}>
                       <div className="mega-intro">
                         <span className="eyebrow">OUR EXPERTISE</span>
                         <h2>

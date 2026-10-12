@@ -88,7 +88,6 @@ export function BlogPage() {
   const { articles, blogCategories } = useContent();
   const interactive = useInteractive();
   const [category, setCategory] = useState("All");
-  const featured = articles[0]!;
   const filtered = articles.filter((a) => category === "All" || a.category === category);
   return (
     <>
@@ -98,41 +97,6 @@ export function BlogPage() {
         title="Ideas that help businesses grow digitally."
         description="Practical thinking on better websites, clearer experiences and the decisions behind digital growth."
       />
-      {featured && (
-        <section className="section-shell featured-article">
-          <Link
-            to="/blog/$slug"
-            params={{ slug: featured.slug }}
-            aria-label={`Read ${featured.title}`}
-          >
-            {featured.image ? (
-              <img
-                src={featured.image}
-                alt={featured.imageAlt || featured.title}
-                className="cms-article-image"
-              />
-            ) : (
-              <ArticleArt type={featured.art} />
-            )}
-          </Link>
-          <div>
-            <p className="eyebrow">THE FEATURED READ / {featured.category}</p>
-            <h2>
-              <Link to="/blog/$slug" params={{ slug: featured.slug }}>
-                {featured.title}
-              </Link>
-            </h2>
-            <p>{featured.excerpt}</p>
-            <p className="article-meta">
-              <time dateTime={featured.date}>{dateLabel(featured.date)}</time>
-              <span>{featured.readTime}</span>
-            </p>
-            <Link to="/blog/$slug" params={{ slug: featured.slug }} className="action">
-              Read Article <ArrowUpRight size={18} />
-            </Link>
-          </div>
-        </section>
-      )}
       <section className="section-space surface">
         <div className="section-shell">
           <Heading label="THE JOURNAL" title="A little perspective goes a long way." />

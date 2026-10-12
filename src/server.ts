@@ -49,6 +49,8 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
+      if (response.headers.get("content-type")?.includes("text/html"))
+        response.headers.set("Cache-Control", "no-store");
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);

@@ -88,7 +88,7 @@ export function ContentList({ kind }: { kind: "portfolio" | "blogs" }) {
                 <th>Category</th>
                 <th>Status</th>
                 {kind === "portfolio" && <th>Featured</th>}
-                <th>Date</th>
+                <th>{kind === "blogs" ? "Display Date" : "Date"}</th>
                 <th>Actions</th>
               </tr>
             </thead>

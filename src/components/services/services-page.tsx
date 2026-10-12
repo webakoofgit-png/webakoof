@@ -173,6 +173,7 @@ export function ServicesPage() {
   return (
     <>
       <InnerHero
+        className="services-breadcrumb-hero"
         label="Our expertise"
         title="Everything your business needs to grow digitally."
         description="From a first website to a custom platform and improvements that make your existing website work better. Thoughtfully planned. Built around you."
@@ -217,16 +218,12 @@ export function ServiceDetailPage({ service: s }: { service: Service }) {
   return (
     <>
       <InnerHero
+        className="services-breadcrumb-hero"
         label={`${s.number} / ${s.title}`}
         title={s.headline}
         description={s.description}
         parent={{ label: "Services", to: "/services" }}
-      >
-        <div className="service-hero-illustration">
-          <ServiceVisual index={services.findIndex((service) => service.slug === s.slug)} />
-          <Action>Get a Quote</Action>
-        </div>
-      </InnerHero>
+      />
       <section className="section-space">
         <div className="section-shell editorial-split">
           <div>
