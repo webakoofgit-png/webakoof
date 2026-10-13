@@ -73,7 +73,10 @@ export function ProjectCard({
       )}
       <div className="project-meta">
         <span>
-          {p.industry} / {p.isConcept === false ? "Published project" : "Design concept"}
+          {"categoryNames" in p && Array.isArray(p.categoryNames)
+            ? p.categoryNames.join(" / ")
+            : p.industry}{" "}
+          / {p.isConcept === false ? "Published project" : "Design concept"}
         </span>
         <Link
           to="/portfolio/$slug"
@@ -106,7 +109,11 @@ export function PortfolioPage() {
   const selected = portfolioSectors.find((category) => category.slug === sector);
   const filter = selected?.name || "All";
   const visible = projects.filter(
-    (p) => !selected || (enabled ? p.categorySlug === selected.slug : p.industry === selected.name),
+    (p) =>
+      !selected ||
+      (enabled
+        ? p.categorySlugs?.includes(selected.slug) || p.categorySlug === selected.slug
+        : p.industry === selected.name),
   );
   const [preparing, setPreparing] = useState(false);
   const downloading = useRef(false);

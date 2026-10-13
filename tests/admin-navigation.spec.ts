@@ -41,3 +41,46 @@ test("all admin pages support direct loads and sidebar navigation", async ({ pag
     expect(errors, path).toEqual([]);
   }
 });
+
+test("dashboard Add Project opens the editor and saves a draft", async ({ page, baseURL }) => {
+  test.skip(
+    !baseURL || !/^http:\/\/(127\.0\.0\.1|localhost):/.test(baseURL),
+    "Local database only",
+  );
+  const credentials = JSON.parse(readFileSync(".local/admin-login.json", "utf8"));
+  const headers = { Origin: baseURL! };
+  const login = await page.request.post("/api/cms/login", {
+    headers,
+    data: { ...credentials, remember: false },
+  });
+  expect(login.status()).toBe(200);
+  const slug = `qa-navigation-${Date.now()}`;
+  try {
+    await page.goto("/admin");
+    await expect(page.getByRole("heading", { name: "Welcome back to WEBakoof." })).toBeVisible();
+    await page
+      .getByRole("navigation", { name: "Admin navigation" })
+      .getByRole("link", { name: "Add Project", exact: true })
+      .click();
+    await expect(page.getByLabel("Project Name *")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Welcome back to WEBakoof." })).toHaveCount(0);
+    await page.getByLabel("Project Name *").fill("QA navigation draft");
+    await page.getByLabel("Slug *").fill(slug);
+    const categories = await (await page.request.get("/api/cms/portfolio-categories")).json();
+    await page
+      .getByLabel("Category *", { exact: true })
+      .selectOption(String(categories.find((c: { status: string }) => c.status === "active").id));
+    await page.getByRole("button", { name: "Save Project", exact: true }).click();
+    await expect(page).toHaveURL(/\/admin\/portfolio$/);
+    const records = await (await page.request.get("/api/cms/portfolio")).json();
+    expect(records.find((p: { slug: string }) => p.slug === slug)?.status).toBe("draft");
+  } finally {
+    const records = await (await page.request.get("/api/cms/portfolio")).json();
+    const record = records.find((p: { slug: string }) => p.slug === slug);
+    if (record)
+      expect(
+        (await page.request.delete(`/api/cms/portfolio/${record.id}`, { headers })).ok(),
+      ).toBeTruthy();
+    await page.request.post("/api/cms/logout", { headers, data: {} });
+  }
+});

@@ -182,6 +182,14 @@ export async function api(request: Request) {
       );
     }
     if (request.method === "DELETE") {
+      if (kind === "portfolio-categories") {
+        const referenced = await rows(
+          "SELECT id FROM portfolio_projects WHERE JSON_CONTAINS(content,?, '$.category_ids') LIMIT 1",
+          [String(validId(id))],
+        );
+        if (referenced.length)
+          throw new HttpError(409, "Move the items in this category before deleting it.");
+      }
       await database().execute(`DELETE FROM ${table} WHERE id=?`, [validId(id)]);
       return reply({ ok: true });
     }
@@ -207,6 +215,15 @@ export async function api(request: Request) {
       const connection = await database().getConnection();
       try {
         await connection.beginTransaction();
+        if ("category_ids" in d) {
+          d.category_ids = [...new Set([d.category_id, ...d.category_ids])];
+          const [categories] = await connection.execute(
+            `SELECT id FROM portfolio_categories WHERE id IN (${d.category_ids.map(() => "?").join(",")}) LOCK IN SHARE MODE`,
+            d.category_ids,
+          );
+          if ((categories as { id: number }[]).length !== d.category_ids.length)
+            throw new HttpError(400, "Choose existing portfolio categories.");
+        }
         let previousSlug: string | undefined;
         if (kind === "blogs" && id) {
           const [existing] = await connection.execute(

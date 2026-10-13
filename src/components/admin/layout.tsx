@@ -197,7 +197,7 @@ function Protected({
           </div>
         </header>
         <div className="adm-content">
-          <Outlet />
+          <Outlet key={path} />
         </div>
       </div>
     </>

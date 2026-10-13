@@ -9,6 +9,7 @@ const projectDefaults = {
   slug: "",
   clientName: "",
   category_id: 0,
+  category_ids: [],
   description: "",
   fullDescription: "",
   status: "draft" as const,
@@ -271,6 +272,34 @@ function Editor({
                   ))}
                 </select>
               </Field>
+              {kind === "portfolio" && (
+                <fieldset className="adm-field">
+                  <legend>Additional categories</legend>
+                  <small>
+                    The project appears in its primary category and any categories selected here.
+                  </small>
+                  {categories
+                    .filter((c) => c.id !== form.category_id)
+                    .map((c) => (
+                      <label key={c.id}>
+                        <input
+                          type="checkbox"
+                          checked={(form.category_ids || []).includes(c.id)}
+                          onChange={(e) =>
+                            change(
+                              "category_ids",
+                              e.target.checked
+                                ? [...(form.category_ids || []), c.id]
+                                : (form.category_ids || []).filter((id) => id !== c.id),
+                            )
+                          }
+                        />{" "}
+                        {c.name}
+                        {c.status === "inactive" ? " (inactive)" : ""}
+                      </label>
+                    ))}
+                </fieldset>
+              )}
               <Field label="Status">
                 <select
                   value={form.status}

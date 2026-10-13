@@ -24,6 +24,7 @@ export const projectSchema = z
     name: z.string().trim().min(1).max(200),
     slug,
     category_id: z.coerce.number().int().positive(),
+    category_ids: z.array(z.number().int().positive()).max(30).default([]),
     status: z.enum(["draft", "published"]),
     featured: z.boolean(),
     include_in_catalogue: z.boolean().default(false),

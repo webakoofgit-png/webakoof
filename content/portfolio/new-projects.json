@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Impact Infra India",
+    "slug": "impact-infra-india",
+    "categories": ["Industrial", "Construction"],
+    "liveUrl": "https://impactinfraindia.com/",
+    "description": "Impact Infra India is a professional industrial and infrastructure solutions company offering reliable construction, engineering, and industrial services. The website showcases the company's expertise, services, projects, and business capabilities.",
+    "service": "Dynamic Website",
+    "imageFile": "impact-infra-india.webp",
+    "videoFile": "impactinfraindia.mp4"
+  },
+  {
+    "name": "Reasonable Tools & Hardware Store",
+    "slug": "reasonable-tools-hardware-store",
+    "categories": ["Industrial"],
+    "liveUrl": "https://reasonabletools.com/",
+    "description": "Reasonable Tools & Hardware Store provides a wide range of industrial tools, hardware products, and equipment solutions. The website presents its product range, business information, and services through a professional and user-friendly platform.",
+    "service": "Dynamic Website",
+    "imageFile": "reasonable-tools-hardware-store.webp",
+    "videoFile": "reasonable tools.mp4"
+  },
+  {
+    "name": "RMK Enterprises",
+    "slug": "rmk-enterprises",
+    "categories": ["Industrial"],
+    "liveUrl": "https://rmkenterprises.in/",
+    "description": "RMK Enterprises is a business-focused industrial website designed to showcase the company's products, services, and industry expertise. The platform provides easy navigation, detailed service information, and a professional online presence.",
+    "service": "Dynamic Website",
+    "imageFile": "rmk-enterprises.webp",
+    "videoFile": "rmk enterprises.mp4"
+  },
+  {
+    "name": "Rushivan Agro",
+    "slug": "rushivan-agro",
+    "categories": ["Agro Tourism"],
+    "liveUrl": "https://www.rushivanagro.com/",
+    "description": "Rushivan Agro is an agro-tourism destination offering visitors an opportunity to experience nature, rural lifestyle, and recreational activities. The website provides information about its attractions, facilities, and visitor experiences through an engaging platform.",
+    "service": "E-commerce Website",
+    "imageFile": "rushivan-agro.webp",
+    "videoFile": "rushivanagro.mp4"
+  }
+]

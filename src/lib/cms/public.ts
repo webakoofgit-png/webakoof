@@ -8,6 +8,9 @@ export type PublicContent = {
     featured?: boolean;
     category?: string;
     categorySlug?: string;
+    category_ids?: number[];
+    categorySlugs?: string[];
+    categoryNames?: string[];
     include_in_catalogue?: boolean;
     catalogue_order?: number | null;
     overview?: string;
