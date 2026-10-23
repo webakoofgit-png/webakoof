@@ -154,42 +154,72 @@ export function ImageField({
   label,
   value,
   onChange,
+  video = false,
   folder = "portfolio",
 }: {
   label: string;
   value: string;
   onChange: (url: string) => void;
   folder?: string;
+  video?: boolean;
 }) {
   const [busy, setBusy] = useState(false);
   return (
     <div className="adm-field">
       <span>{label}</span>
-      {value && <img className="adm-image-preview" src={value} alt={label} />}
+      {value &&
+        (video ? (
+          <video
+            className="adm-image-preview"
+            src={value}
+            controls
+            preload="metadata"
+            aria-label={label}
+          />
+        ) : (
+          <img className="adm-image-preview" src={value} alt={label} />
+        ))}
       <div className="adm-actions">
         <label className="adm-upload">
-          {busy ? "Uploading…" : value ? "Replace image" : "Upload image"}
+          {busy
+            ? "Uploading…"
+            : value
+              ? video
+                ? "Replace video"
+                : "Replace image"
+              : video
+                ? "Upload video"
+                : "Upload image"}
           <input
             aria-label={label}
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept={video ? "video/mp4,.mp4" : "image/jpeg,image/png,image/webp"}
             disabled={busy}
             onChange={async (e) => {
               const file = e.target.files?.[0];
               if (!file) return;
+              const input = e.currentTarget;
+              if (file.size > (video ? 20 : 5) * 1024 * 1024) {
+                toast.error(`Maximum file size is ${video ? 20 : 5} MB.`);
+                input.value = "";
+                return;
+              }
               setBusy(true);
               try {
                 const form = new FormData();
                 form.set("file", file);
                 form.set("folder", folder);
+                form.set("kind", video ? "video" : "image");
                 form.set("alt", label);
                 onChange((await api<{ url: string }>("upload", "POST", form)).url);
-                toast.success("Image uploaded. Save your changes to use it.");
+                toast.success(
+                  `${video ? "Video" : "Image"} uploaded. Save your changes to use it.`,
+                );
               } catch (error) {
                 toast.error((error as Error).message);
               } finally {
                 setBusy(false);
-                e.target.value = "";
+                input.value = "";
               }
             }}
           />
@@ -200,7 +230,11 @@ export function ImageField({
           </button>
         )}
       </div>
-      <small>JPG, PNG or WebP. Maximum 5 MB.</small>
+      <small>
+        {video
+          ? "MP4. Maximum 20 MB. Save the project after uploading."
+          : "JPG, PNG or WebP. Maximum 5 MB."}
+      </small>
     </div>
   );
 }

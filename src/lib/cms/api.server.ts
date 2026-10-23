@@ -337,11 +337,11 @@ async function body(request: Request) {
   }
 }
 async function upload(request: Request) {
-  const max = 5 * 1024 * 1024;
+  const max = 20 * 1024 * 1024;
   if (Number(request.headers.get("content-length") || 0) > max + 20000)
-    throw new HttpError(413, "Maximum image size is 5 MB.");
+    throw new HttpError(413, "Maximum upload size is 20 MB.");
   const reader = request.body?.getReader();
-  if (!reader) throw new HttpError(400, "Choose an image.");
+  if (!reader) throw new HttpError(400, "Choose a file.");
   const chunks: Uint8Array[] = [];
   let size = 0;
   while (true) {
@@ -350,7 +350,7 @@ async function upload(request: Request) {
     size += part.value.length;
     if (size > max + 20000) {
       await reader.cancel();
-      throw new HttpError(413, "Maximum image size is 5 MB.");
+      throw new HttpError(413, "Maximum upload size is 20 MB.");
     }
     chunks.push(part.value);
   }
@@ -361,18 +361,33 @@ async function upload(request: Request) {
   }).formData();
   const file = form.get("file");
   const folder = z.enum(["homepage", "portfolio", "blog", "settings"]).parse(form.get("folder"));
-  if (!(file instanceof File) || !file.size || file.size > max)
-    throw new HttpError(400, "Choose an image up to 5 MB.");
+  const video = form.get("kind") === "video";
+  if (video && folder !== "portfolio")
+    throw new HttpError(400, "Videos are only supported for portfolio projects.");
+  if (!(file instanceof File) || !file.size || file.size > (video ? 20 : 5) * 1024 * 1024)
+    throw new HttpError(
+      400,
+      video ? "Choose an MP4 video up to 20 MB." : "Choose an image up to 5 MB.",
+    );
   const bytes = Buffer.from(await file.arrayBuffer());
-  const extension = bytes.subarray(0, 3).equals(Buffer.from([255, 216, 255]))
-    ? "jpg"
-    : bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
-      ? "png"
-      : bytes.toString("ascii", 0, 4) === "RIFF" && bytes.toString("ascii", 8, 12) === "WEBP"
-        ? "webp"
-        : null;
-  if (!extension || !/\.(jpe?g|png|webp)$/i.test(file.name))
-    throw new HttpError(400, "Only JPG, PNG and WebP images are supported.");
+  const extension = video
+    ? bytes.length >= 16 &&
+      bytes.toString("ascii", 4, 8) === "ftyp" &&
+      /^(isom|iso[2-9]|mp4[12]|avc1|M4V |MSNV)$/.test(bytes.toString("ascii", 8, 12))
+      ? "mp4"
+      : null
+    : bytes.subarray(0, 3).equals(Buffer.from([255, 216, 255]))
+      ? "jpg"
+      : bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+        ? "png"
+        : bytes.toString("ascii", 0, 4) === "RIFF" && bytes.toString("ascii", 8, 12) === "WEBP"
+          ? "webp"
+          : null;
+  if (!extension || !(video ? /\.mp4$/i : /\.(jpe?g|png|webp)$/i).test(file.name))
+    throw new HttpError(
+      400,
+      video ? "Choose a valid MP4 video." : "Only JPG, PNG and WebP images are supported.",
+    );
   const filename = randomUUID() + "." + extension;
   const url = `/uploads/${folder}/${filename}`;
   const connection = await database().getConnection();
@@ -385,7 +400,7 @@ async function upload(request: Request) {
         `${folder}/${filename}`,
         url,
         String(form.get("alt") || "").slice(0, 255),
-        "image/" + (extension === "jpg" ? "jpeg" : extension),
+        extension === "mp4" ? "video/mp4" : "image/" + (extension === "jpg" ? "jpeg" : extension),
         bytes.length,
       ],
     );

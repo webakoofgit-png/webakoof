@@ -366,11 +366,12 @@ function Editor({
                   {image("desktopImage", "Desktop Screenshot")}
                   {image("mobileImage", "Mobile Screenshot")}
                 </div>
-                {input("showcaseVideo", "Showcase Video URL")}
-                <p className="adm-help">
-                  Use the project's MP4 recording URL, for example /projects/rockals.mp4. It appears
-                  in the case study's website preview section.
-                </p>
+                <ImageField
+                  label="Showcase Video"
+                  video
+                  value={form.showcaseVideo || ""}
+                  onChange={(url) => change("showcaseVideo", url)}
+                />
                 <h3>Gallery Images</h3>
                 <div className="adm-gallery">
                   {form.gallery.map((item: EditorForm["gallery"][number], index: number) => (

@@ -68,7 +68,12 @@ test("imported media remains editable and draft video previews load", async ({ p
   expect(project.showcaseVideo).toBe("/projects/suntech%20.mp4");
   await page.goto(`/admin/portfolio/${project.id}`);
   await page.getByRole("tab", { name: "Media", exact: true }).click();
-  await expect(page.getByLabel("Showcase Video URL", { exact: true })).toHaveValue(
+  await expect(page.locator('input[type="file"][aria-label="Showcase Video"]')).toHaveAttribute(
+    "type",
+    "file",
+  );
+  await expect(page.locator("video.adm-image-preview")).toHaveAttribute(
+    "src",
     project.showcaseVideo,
   );
   await page.goto(`/admin/preview/portfolio/${project.id}`);
