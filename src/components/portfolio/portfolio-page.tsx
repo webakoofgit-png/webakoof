@@ -16,39 +16,13 @@ export function ProjectCard({
 }) {
   const projectVisual = (
     <>
-      {p.mobileImage ? (
-        <span
-          className="project-device-composition"
-          aria-label={`${p.name} desktop and mobile views`}
-        >
-          <span className="project-browser">
-            <img
-              src={p.image}
-              alt={`${p.name} desktop website`}
-              width={1440}
-              height={900}
-              loading="lazy"
-            />
-          </span>
-          <span className="project-phone">
-            <img
-              src={p.mobileImage}
-              alt={`${p.name} mobile website`}
-              width={390}
-              height={844}
-              loading="lazy"
-            />
-          </span>
-        </span>
-      ) : (
-        <img
-          src={p.image}
-          alt={`${p.name} responsive website`}
-          width={1408}
-          height={1008}
-          loading="lazy"
-        />
-      )}
+      <img
+        src={p.image}
+        alt={`${p.name} responsive website`}
+        width={1408}
+        height={1008}
+        loading="lazy"
+      />
       <span className="project-overlay">
         {p.liveUrl ? "Visit Website" : "View Case Study"} <ArrowUpRight />
       </span>
