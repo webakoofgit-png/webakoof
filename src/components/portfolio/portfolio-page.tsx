@@ -215,7 +215,7 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
         </div>
         <img
           className="case-main-image"
-          src={p.coverImage || p.image}
+          src={p.image}
           alt={`${p.name} complete responsive design concept`}
           width={1408}
           height={1008}
@@ -290,7 +290,7 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
                 muted
                 playsInline
                 preload="metadata"
-                poster={p.desktopImage || p.image || undefined}
+                poster={p.image || undefined}
                 aria-label={`${p.name} scrolling website preview`}
               >
                 <source src={p.showcaseVideo} type="video/mp4" />
