@@ -1984,7 +1984,7 @@ svg {
   display: block;
   width: 100%;
   height: auto;
-  max-height: min(60svh, 520px);
+  max-height: min(85svh, 800px);
   object-fit: contain;
   border-radius: 14px;
 }
