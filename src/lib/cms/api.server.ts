@@ -337,9 +337,9 @@ async function body(request: Request) {
   }
 }
 async function upload(request: Request) {
-  const max = 20 * 1024 * 1024;
+  const max = 50 * 1024 * 1024;
   if (Number(request.headers.get("content-length") || 0) > max + 20000)
-    throw new HttpError(413, "Maximum upload size is 20 MB.");
+    throw new HttpError(413, "Maximum upload size is 50 MB.");
   const reader = request.body?.getReader();
   if (!reader) throw new HttpError(400, "Choose a file.");
   const chunks: Uint8Array[] = [];
@@ -350,7 +350,7 @@ async function upload(request: Request) {
     size += part.value.length;
     if (size > max + 20000) {
       await reader.cancel();
-      throw new HttpError(413, "Maximum upload size is 20 MB.");
+      throw new HttpError(413, "Maximum upload size is 50 MB.");
     }
     chunks.push(part.value);
   }
@@ -364,10 +364,10 @@ async function upload(request: Request) {
   const video = form.get("kind") === "video";
   if (video && folder !== "portfolio")
     throw new HttpError(400, "Videos are only supported for portfolio projects.");
-  if (!(file instanceof File) || !file.size || file.size > (video ? 20 : 5) * 1024 * 1024)
+  if (!(file instanceof File) || !file.size || file.size > (video ? 50 : 5) * 1024 * 1024)
     throw new HttpError(
       400,
-      video ? "Choose an MP4 video up to 20 MB." : "Choose an image up to 5 MB.",
+      video ? "Choose an MP4 video up to 50 MB." : "Choose an image up to 5 MB.",
     );
   const bytes = Buffer.from(await file.arrayBuffer());
   const extension = video

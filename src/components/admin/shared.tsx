@@ -199,8 +199,8 @@ export function ImageField({
               const file = e.target.files?.[0];
               if (!file) return;
               const input = e.currentTarget;
-              if (file.size > (video ? 20 : 5) * 1024 * 1024) {
-                toast.error(`Maximum file size is ${video ? 20 : 5} MB.`);
+              if (file.size > (video ? 50 : 5) * 1024 * 1024) {
+                toast.error(`Maximum file size is ${video ? 50 : 5} MB.`);
                 input.value = "";
                 return;
               }
@@ -232,7 +232,7 @@ export function ImageField({
       </div>
       <small>
         {video
-          ? "MP4. Maximum 20 MB. Save the project after uploading."
+          ? "MP4. Maximum 50 MB. Save the project after uploading."
           : "JPG, PNG or WebP. Maximum 5 MB."}
       </small>
     </div>

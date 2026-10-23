@@ -362,9 +362,6 @@ function Editor({
                 <h3>Project Media</h3>
                 <div className="adm-form-grid">
                   {image("image", "Main Thumbnail *")}
-                  {image("coverImage", "Cover Image")}
-                  {image("desktopImage", "Desktop Screenshot")}
-                  {image("mobileImage", "Mobile Screenshot")}
                 </div>
                 <ImageField
                   label="Showcase Video"

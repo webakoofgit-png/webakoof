@@ -53,7 +53,7 @@ npm run build
 npm start
 ```
 
-Set `PORT` and `HOST` as needed. Use HTTPS in production, set `APP_ORIGIN` and `VITE_SITE_URL` to the public origin, and keep all DB/session secrets server-side. Production session cookies are Secure, HttpOnly, SameSite=Strict. The reverse proxy must forward requests to the Node server without caching admin HTML/API responses. Configure a request-body limit around 6 MB and proxy-level login/form throttling for production traffic.
+Set `PORT` and `HOST` as needed. Use HTTPS in production, set `APP_ORIGIN` and `VITE_SITE_URL` to the public origin, and keep all DB/session secrets server-side. Production session cookies are Secure, HttpOnly, SameSite=Strict. The reverse proxy must forward requests to the Node server without caching admin HTML/API responses. Portfolio video uploads support MP4 files up to 50 MB; images remain limited to 5 MB. Configure a request-body limit of at least 51 MiB and MySQL max_allowed_packet of at least 64 MiB. Configure proxy-level login/form throttling for production traffic.
 
 Build on the target operating system. Back up MySQL, `uploads/`, and the migrated `public/cms-seed/` assets together. Never upload `.env`, `.local`, test traces or generated credentials to a public repository.
 
