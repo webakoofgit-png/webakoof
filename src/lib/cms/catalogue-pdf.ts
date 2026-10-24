@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { isWebsiteLive } from "./availability";
 import type { loadCatalogue } from "./catalogue.server";
 
 // Browser image decoding also supports uploaded WebP and SVG brand marks.
@@ -141,7 +142,19 @@ export async function downloadCatalogue(
       pdf.text(line, 22, y);
       y += 5.2;
     }
-    if (project.liveUrl && /^https?:\/\//i.test(project.liveUrl)) {
+    if (y > 234) {
+      footer();
+      pdf.addPage();
+      brand();
+      y = 49;
+    }
+    pdf.setTextColor("#111111");
+    pdf.setFontSize(11);
+    pdf.textWithLink("View Webakoof case study", 22, y + 7, {
+      url: new URL(`/portfolio/${encodeURIComponent(project.slug)}`, window.location.origin).href,
+    });
+    y += 12;
+    if (isWebsiteLive(project) && project.liveUrl && /^https?:\/\//i.test(project.liveUrl)) {
       if (y > 234) {
         footer();
         pdf.addPage();

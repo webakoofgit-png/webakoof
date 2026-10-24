@@ -52,6 +52,13 @@ export const projectSchema = z
           .refine((v) => /^https?:\/\//i.test(v), "Use an HTTP(S) website URL."),
       ])
       .default(""),
+    websiteAvailability: z
+      .enum(["live", "temporarily_unavailable", "domain_expired", "permanently_offline"])
+      .default("live"),
+    lastCheckedAt: z.union([z.literal(""), z.string().datetime()]).default(""),
+    lastCheckResult: text.default(""),
+    adminNotes: text.default(""),
+    websiteStatusUpdatedAt: z.union([z.literal(""), z.string().datetime()]).default(""),
     year: text.default(""),
     service: z.string().trim().max(200).default(""),
     services: z.array(text).max(30).default([]),

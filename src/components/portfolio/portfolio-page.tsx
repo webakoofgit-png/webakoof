@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { ArrowUpRight, Download } from "lucide-react";
 import { CTA, Heading, InnerHero } from "@/components/shared/page";
 import { type Project } from "@/data/projects";
+import { isWebsiteLive } from "@/lib/cms/availability";
 import { useContent } from "@/lib/cms/context";
 import type { PublicContent } from "@/lib/cms/public";
 import { getCatalogue } from "@/lib/cms/public";
@@ -24,27 +25,15 @@ export function ProjectCard({
         loading="lazy"
       />
       <span className="project-overlay">
-        {p.liveUrl ? "Visit Website" : "View Case Study"} <ArrowUpRight />
+        View Case Study <ArrowUpRight />
       </span>
     </>
   );
   return (
     <article className={`project-card ${featured ? "project-featured" : ""}`}>
-      {p.liveUrl ? (
-        <a
-          href={p.liveUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="project-image"
-          aria-label={`Visit ${p.name} website`}
-        >
-          {projectVisual}
-        </a>
-      ) : (
-        <Link to="/portfolio/$slug" params={{ slug: p.slug }} className="project-image">
-          {projectVisual}
-        </Link>
-      )}
+      <Link to="/portfolio/$slug" params={{ slug: p.slug }} className="project-image">
+        {projectVisual}
+      </Link>
       <div className="project-meta">
         <span>
           {"categoryNames" in p && Array.isArray(p.categoryNames)
@@ -186,9 +175,6 @@ export function PortfolioPage() {
   );
 }
 export function ProjectDetailPage({ project: p }: { project: PublicContent["projects"][number] }) {
-  const { projects } = useContent();
-  const next =
-    projects[(projects.findIndex((item) => item.slug === p.slug) + 1) % projects.length] || p;
   return (
     <>
       <InnerHero
@@ -221,7 +207,7 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
           height={1008}
           fetchPriority="high"
         />
-        {p.liveUrl && (
+        {p.liveUrl && isWebsiteLive(p) && (
           <div className="case-actions">
             <a className="action" href={p.liveUrl} target="_blank" rel="noreferrer">
               Visit {p.name} <ArrowUpRight size={18} />
@@ -229,18 +215,18 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
             <span>Live website · Opens in a new tab</span>
           </div>
         )}
+        {!isWebsiteLive(p) && (
+          <p className="case-availability-notice">
+            This project was designed and developed by Webakoof. The live website is currently
+            unavailable, but you can explore the project details and screenshots here.
+          </p>
+        )}
       </div>
       <section className="section-space">
         <div className="section-shell editorial-split">
           <Heading label="01 / PROJECT OVERVIEW" title="An experience with a clear purpose." />
           <div>
             <p className="lead-copy">{p.overview || p.description}</p>
-            {p.fullDescription && <p>{p.fullDescription}</p>}
-            <p>
-              {p.isConcept === false
-                ? "This published project is presented as a Webakoof website development engagement."
-                : "This case study explores the design direction shown in the existing project artwork. Technology labels describe the proposed direction, not a verified deployed implementation."}
-            </p>
           </div>
         </div>
       </section>
@@ -248,8 +234,7 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
         <div className="section-shell case-story">
           {[
             ["02", "The challenge", p.challenge],
-            ["03", "Our approach", p.approach],
-            ["04", "The solution", p.solution],
+            ["03", "The solution", p.solution],
           ].map(([num, title, text]) => (
             <article key={num}>
               <span>{num}</span>
@@ -257,26 +242,21 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
               <p>{text}</p>
             </article>
           ))}
-        </div>
-      </section>
-      <section className="section-space">
-        <div className="section-shell editorial-split">
-          <Heading label="05 / KEY FEATURES" title="The building blocks of the experience." />
-          <div>
-            {p.features.map((f, i) => (
-              <div className="solution-row" key={f}>
-                <span>0{i + 1}</span>
-                <h3>{f}</h3>
-                <ArrowUpRight />
-              </div>
-            ))}
-            <h3 className="technology-heading">Technology direction</h3>
+          <article>
+            <span>04</span>
+            <h2>Key features</h2>
+            <ul className="case-feature-list">
+              {p.features.map((feature) => (
+                <li key={feature}>{feature}</li>
+              ))}
+            </ul>
+            {p.tags.length > 0 && <h3 className="technology-heading">Technology used</h3>}
             <div className="tags">
               {p.tags.map((t) => (
                 <span key={t}>{t}</span>
               ))}
             </div>
-          </div>
+          </article>
         </div>
       </section>
       <section className="section-space surface">
@@ -344,20 +324,8 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
               {p.result ||
                 "The direction prioritises useful information, recognisable branding and an easier journey towards enquiry or purchase."}
             </p>
-            <p>
-              {p.isConcept === false
-                ? "The responsive structure gives patients a clear route from service discovery to appointment enquiry across desktop and mobile."
-                : "No live performance data is available for this concept. Conversion, speed and engagement results would need to be measured against a real baseline after implementation."}
-            </p>
           </div>
         </div>
-      </section>
-      <section className="section-shell next-project">
-        <span className="eyebrow">NEXT CONCEPT</span>
-        <Link to="/portfolio/$slug" params={{ slug: next.slug }}>
-          {next.name}
-          <ArrowUpRight />
-        </Link>
       </section>
       <CTA title="Have a similar project? Let’s talk." />
     </>

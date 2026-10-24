@@ -72,6 +72,12 @@ export async function api(request: Request) {
       });
     }
     const admin = await requireAdmin(request);
+    if (kind === "check-website" && request.method === "POST") {
+      await rateLimit("website-check:" + admin.id, 10, 60);
+      const data = z.object({ url: z.string().url().max(1000) }).parse(await body(request));
+      const { checkWebsite } = await import("./website-check.server");
+      return reply(await checkWebsite(data.url));
+    }
     if (kind === "logout" && request.method === "POST") {
       await database().execute("DELETE FROM admin_sessions WHERE token_hash=?", [
         digest(cookieToken(request)),
@@ -215,6 +221,53 @@ export async function api(request: Request) {
       const connection = await database().getConnection();
       try {
         await connection.beginTransaction();
+        if (kind === "portfolio" && "websiteAvailability" in d) {
+          let previous: Record<string, unknown> = {};
+          if (id) {
+            const [records] = await connection.execute(
+              "SELECT content FROM portfolio_projects WHERE id=? FOR UPDATE",
+              [validId(id)],
+            );
+            const record = (records as { content: unknown }[])[0];
+            if (!record) throw new HttpError(404, "This project no longer exists.");
+            previous = json(record.content);
+          }
+          d.websiteStatusUpdatedAt =
+            !id || (previous["websiteAvailability"] ?? "live") !== d.websiteAvailability
+              ? new Date().toISOString()
+              : String(previous["websiteStatusUpdatedAt"] || "");
+          const oldGallery = (previous["gallery"] || []) as { url: string }[];
+          const previousMedia = new Set([
+            ...[
+              "image",
+              "coverImage",
+              "desktopImage",
+              "mobileImage",
+              "ogImage",
+              "showcaseVideo",
+            ].map((key) => previous[key]),
+            ...oldGallery.map((item) => item.url),
+          ]);
+          for (const media of [
+            d.image,
+            d.coverImage,
+            d.desktopImage,
+            d.mobileImage,
+            d.ogImage,
+            d.showcaseVideo,
+            ...d.gallery.map((item) => item.url),
+          ]) {
+            if (media && !previousMedia.has(media) && !/^\/(?!\/)/.test(media))
+              throw new HttpError(
+                400,
+                "Upload project media to Webakoof instead of linking to a client domain. Existing media is preserved.",
+              );
+          }
+          if (previous["liveUrl"] !== d.liveUrl && d.lastCheckedAt === previous["lastCheckedAt"]) {
+            d.lastCheckedAt = "";
+            d.lastCheckResult = "";
+          }
+        }
         if ("category_ids" in d) {
           d.category_ids = [...new Set([d.category_id, ...d.category_ids])];
           const [categories] = await connection.execute(

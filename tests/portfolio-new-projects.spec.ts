@@ -18,9 +18,10 @@ test("four portfolio projects, categories, images, links and responsive layout",
       .filter({ has: page.getByRole("heading", { name: project.name, exact: true }) });
     await expect(card).toHaveCount(1);
     await expect(card.locator(".project-service")).toHaveText(project.service);
-    const visit = card.getByRole("link", { name: `Visit ${project.name} website`, exact: true });
-    await expect(visit).toHaveAttribute("href", project.liveUrl);
-    await expect(visit).toHaveAttribute("target", "_blank");
+    await expect(card.locator(".project-image")).toHaveAttribute(
+      "href",
+      `/portfolio/${project.slug}`,
+    );
     await card.locator("img").scrollIntoViewIfNeeded();
     await expect
       .poll(() =>

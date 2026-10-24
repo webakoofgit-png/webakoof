@@ -4,6 +4,7 @@ import { AdminLink as Link } from "./link";
 import { toast } from "sonner";
 import { api, DataState, Field, ImageField, Tabs, makeSlug, useData, useDirty } from "./shared";
 import { RichEditor } from "./rich-editor";
+import { websiteStatuses } from "@/lib/cms/availability";
 const projectDefaults = {
   name: "",
   slug: "",
@@ -23,6 +24,11 @@ const projectDefaults = {
   gallery: [],
   industry: "",
   liveUrl: "",
+  websiteAvailability: "live" as const,
+  lastCheckedAt: "",
+  lastCheckResult: "",
+  adminNotes: "",
+  websiteStatusUpdatedAt: "",
   year: "",
   service: "",
   services: [],
@@ -101,9 +107,16 @@ function Editor({
   const [saved, setSaved] = useState(JSON.stringify(initial));
   const [tab, setTab] = useState("Basic Info");
   const [busy, setBusy] = useState(false);
+  const [checking, setChecking] = useState(false);
   const warning = useDirty(JSON.stringify(form) !== saved);
   const change = <K extends keyof EditorForm>(key: K, value: EditorForm[K]) =>
-    setForm((f) => ({ ...f, [key]: value }));
+    setForm((f) => ({
+      ...f,
+      [key]: value,
+      ...(key === "liveUrl" && value !== f.liveUrl
+        ? { lastCheckedAt: "", lastCheckResult: "" }
+        : {}),
+    }));
   const input = (key: StringKey, label: string, type = "text", required = false) => (
     <Field label={label} key={key}>
       <input
@@ -184,7 +197,12 @@ function Editor({
           setBusy(true);
           try {
             await api(kind + (id === "new" ? "" : "/" + id), id === "new" ? "POST" : "PUT", form);
-            setSaved(JSON.stringify(form));
+            if (kind === "portfolio" && id !== "new") {
+              const records = await api<ContentRecord[]>(kind + "/" + id);
+              const updated = { ...form, ...records[0] };
+              setForm(updated);
+              setSaved(JSON.stringify(updated));
+            } else setSaved(JSON.stringify(form));
             toast.success(
               kind === "portfolio"
                 ? "Project saved successfully."
@@ -273,31 +291,33 @@ function Editor({
                 </select>
               </Field>
               {kind === "portfolio" && (
-                <fieldset className="adm-field">
+                <fieldset className="adm-field adm-category-field">
                   <legend>Additional categories</legend>
                   <small>
                     The project appears in its primary category and any categories selected here.
                   </small>
-                  {categories
-                    .filter((c) => c.id !== form.category_id)
-                    .map((c) => (
-                      <label key={c.id}>
-                        <input
-                          type="checkbox"
-                          checked={(form.category_ids || []).includes(c.id)}
-                          onChange={(e) =>
-                            change(
-                              "category_ids",
-                              e.target.checked
-                                ? [...(form.category_ids || []), c.id]
-                                : (form.category_ids || []).filter((id) => id !== c.id),
-                            )
-                          }
-                        />{" "}
-                        {c.name}
-                        {c.status === "inactive" ? " (inactive)" : ""}
-                      </label>
-                    ))}
+                  <div className="adm-category-options">
+                    {categories
+                      .filter((c) => c.id !== form.category_id)
+                      .map((c) => (
+                        <label key={c.id}>
+                          <input
+                            type="checkbox"
+                            checked={(form.category_ids || []).includes(c.id)}
+                            onChange={(e) =>
+                              change(
+                                "category_ids",
+                                e.target.checked
+                                  ? [...(form.category_ids || []), c.id]
+                                  : (form.category_ids || []).filter((id) => id !== c.id),
+                              )
+                            }
+                          />{" "}
+                          {c.name}
+                          {c.status === "inactive" ? " (inactive)" : ""}
+                        </label>
+                      ))}
+                  </div>
                 </fieldset>
               )}
               <Field label="Status">
@@ -334,7 +354,6 @@ function Editor({
               kind === "portfolio" ? "description" : "excerpt",
               kind === "portfolio" ? "Short Description" : "Excerpt",
             )}
-            {kind === "portfolio" && area("fullDescription", "Full Description")}
             {kind === "blogs" && (
               <>
                 <div className="adm-form-grid">
@@ -360,93 +379,155 @@ function Editor({
             <>
               <div hidden={tab !== "Media"}>
                 <h3>Project Media</h3>
-                <div className="adm-form-grid">
-                  {image("image", "Main Thumbnail *")}
-                </div>
+                <div className="adm-form-grid">{image("image", "Main Thumbnail *")}</div>
                 <ImageField
                   label="Showcase Video"
                   video
                   value={form.showcaseVideo || ""}
                   onChange={(url) => change("showcaseVideo", url)}
                 />
-                <h3>Gallery Images</h3>
-                <div className="adm-gallery">
-                  {form.gallery.map((item: EditorForm["gallery"][number], index: number) => (
+                <details className="adm-seo">
+                  <summary>Optional screenshots and gallery</summary>
+                  <p className="adm-help">
+                    Upload images here to keep them available independently of the client website.
+                    Existing uploads are preserved.
+                  </p>
+                  <div className="adm-form-grid">
+                    {image("desktopImage", "Desktop Screenshot")}
+                    {image("mobileImage", "Mobile Screenshot")}
+                  </div>
+                  {form.gallery.map((item, index) => (
                     <div className="adm-card" key={index}>
-                      {imageGallery(item, index)}
-                      <div className="adm-actions">
-                        <button
-                          type="button"
-                          disabled={index === 0}
-                          onClick={() => {
-                            const gallery = [...form.gallery];
-                            [gallery[index - 1], gallery[index]] = [
-                              gallery[index]!,
-                              gallery[index - 1]!,
-                            ];
-                            change("gallery", gallery);
-                          }}
-                        >
-                          Move up
-                        </button>
-                        <button
-                          type="button"
-                          disabled={index === form.gallery.length - 1}
-                          onClick={() => {
-                            const gallery = [...form.gallery];
-                            [gallery[index + 1], gallery[index]] = [
-                              gallery[index]!,
-                              gallery[index + 1]!,
-                            ];
-                            change("gallery", gallery);
-                          }}
-                        >
-                          Move down
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() =>
+                      <ImageField
+                        label={`Gallery Image ${index + 1}`}
+                        value={item.url}
+                        onChange={(url) =>
+                          change(
+                            "gallery",
+                            form.gallery.map((entry, i) =>
+                              i === index ? { ...entry, url } : entry,
+                            ),
+                          )
+                        }
+                      />
+                      <Field label="Alt Text">
+                        <input
+                          value={item.alt}
+                          onChange={(e) =>
                             change(
                               "gallery",
-                              form.gallery.filter((_, i) => i !== index),
+                              form.gallery.map((entry, i) =>
+                                i === index ? { ...entry, alt: e.target.value } : entry,
+                              ),
                             )
                           }
-                        >
-                          Remove
-                        </button>
-                      </div>
+                        />
+                      </Field>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          change(
+                            "gallery",
+                            form.gallery.filter((_, i) => i !== index),
+                          )
+                        }
+                      >
+                        Remove image
+                      </button>
                     </div>
                   ))}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => change("gallery", [...form.gallery, { url: "", alt: "" }])}
-                >
-                  + Add Gallery Image
-                </button>
+                  <button
+                    type="button"
+                    disabled={form.gallery.length >= 30}
+                    onClick={() => change("gallery", [...form.gallery, { url: "", alt: "" }])}
+                  >
+                    Add Gallery Image
+                  </button>
+                </details>
               </div>
               <div hidden={tab !== "Project Details"}>
                 <h3>Project Details</h3>
+                <fieldset className="adm-field">
+                  <legend>Website availability</legend>
+                  <p className="adm-help">
+                    Live is the initial default for existing projects, not a verified result. Review
+                    checks and choose the public status manually.
+                  </p>
+                  <div className="adm-form-grid">
+                    <Field label="Website Availability">
+                      <select
+                        value={form.websiteAvailability}
+                        onChange={(e) =>
+                          change(
+                            "websiteAvailability",
+                            e.target.value as EditorForm["websiteAvailability"],
+                          )
+                        }
+                      >
+                        {Object.entries(websiteStatuses).map(([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </Field>
+                    <Field label="Website Status Last Updated">
+                      <input readOnly value={form.websiteStatusUpdatedAt || "Not updated yet"} />
+                    </Field>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={checking || !form.liveUrl}
+                    onClick={async () => {
+                      setChecking(true);
+                      const checkedUrl = form.liveUrl;
+                      try {
+                        const result = await api<{
+                          checkedAt: string;
+                          result: string;
+                          status: number | null;
+                          redirects: number;
+                        }>("check-website", "POST", { url: checkedUrl });
+                        setForm((current) =>
+                          current.liveUrl !== checkedUrl
+                            ? current
+                            : {
+                                ...current,
+                                lastCheckedAt: result.checkedAt,
+                                lastCheckResult: `${result.result} Redirects: ${result.redirects}.`,
+                              },
+                        );
+                        toast.success(
+                          "Check complete. Review the result, choose availability and save the project.",
+                        );
+                      } catch (error) {
+                        toast.error((error as Error).message);
+                      } finally {
+                        setChecking(false);
+                      }
+                    }}
+                  >
+                    {checking ? "Checking website…" : "Check Website Status"}
+                  </button>
+                  <div aria-live="polite">
+                    {form.lastCheckedAt && (
+                      <p className="adm-help">Last checked: {form.lastCheckedAt}</p>
+                    )}
+                    {form.lastCheckResult && <p>{form.lastCheckResult}</p>}
+                  </div>
+                  {area("adminNotes", "Admin Notes (private)")}
+                </fieldset>
                 <div className="adm-form-grid">
-                  {input("industry", "Industry")}
-                  {input("year", "Year")}
                   {input("service", "Website Type / Service")}
-                  {lines("services", "Related Service Slugs")}
                   {lines("tags", "Technology Used")}
                   {lines("features", "Key Features")}
-                  <Field label="Project Type">
-                    <select
-                      value={String(form.isConcept)}
-                      onChange={(e) => change("isConcept", e.target.value === "true")}
-                    >
-                      <option value="false">Client project</option>
-                      <option value="true">Design concept</option>
-                    </select>
-                  </Field>
                 </div>
                 {area("overview", "Project Overview")}
                 {area("challenge", "Challenge")}
-                {area("approach", "Approach")}
+                <details className="adm-seo">
+                  <summary>Optional approach content</summary>
+                  {area("approach", "Our Approach")}
+                </details>
                 {area("solution", "Solution")}
                 {area("result", "Result")}
               </div>
@@ -471,31 +552,4 @@ function Editor({
       </form>
     </>
   );
-  function imageGallery(item: EditorForm["gallery"][number], index: number) {
-    return (
-      <>
-        <ImageField
-          label={`Gallery Image ${index + 1}`}
-          value={item.url}
-          onChange={(url) =>
-            change(
-              "gallery",
-              form.gallery.map((v, i) => (i === index ? { ...v, url } : v)),
-            )
-          }
-        />
-        <Field label="Alt Text">
-          <input
-            value={item.alt}
-            onChange={(e) =>
-              change(
-                "gallery",
-                form.gallery.map((v, i) => (i === index ? { ...v, alt: e.target.value } : v)),
-              )
-            }
-          />
-        </Field>
-      </>
-    );
-  }
 }

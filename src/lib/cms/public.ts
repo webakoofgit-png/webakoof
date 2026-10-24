@@ -6,6 +6,7 @@ import type { settingsDefaults } from "./defaults";
 export type PublicContent = {
   projects: (Project & {
     featured?: boolean;
+    websiteAvailability?: import("./availability").WebsiteAvailability;
     category?: string;
     categorySlug?: string;
     category_ids?: number[];

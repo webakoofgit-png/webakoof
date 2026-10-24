@@ -1,5 +1,6 @@
 import { cmsEnabled, rows, json } from "./db.server";
 import type { PublicContent } from "./public";
+import { publicProject } from "./availability";
 
 export async function loadCatalogue(sector?: string) {
   if (!cmsEnabled()) throw new Error("Catalogue downloads require the MySQL CMS.");
@@ -27,7 +28,7 @@ export async function loadCatalogue(sector?: string) {
   return {
     sector: categories[0]?.name || "Complete WEBakoof",
     projects: projects.map((p) => ({
-      ...json<PublicContent["projects"][number]>(p["content"]),
+      ...publicProject(json<PublicContent["projects"][number]>(p["content"])),
       category: String(p["category"]),
     })),
     settings: json<PublicContent["settings"]>(settings[0]["content"]),

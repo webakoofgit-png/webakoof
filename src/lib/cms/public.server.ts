@@ -2,6 +2,7 @@ import { cmsEnabled, rows, json } from "./db.server";
 import { settingsDefaults } from "./defaults";
 import type { PublicContent } from "./public";
 import { cleanArticle } from "./rich-text.server";
+import { publicProject } from "./availability";
 export async function loadPublicContent(): Promise<PublicContent> {
   if (!cmsEnabled()) {
     const { projects } = await import("@/data/projects");
@@ -43,7 +44,7 @@ export async function loadPublicContent(): Promise<PublicContent> {
       const ids = new Set([Number(p["category_id"]), ...(project.category_ids || [])]);
       const categories = pc.filter((c) => ids.has(Number(c["id"])));
       return {
-        ...project,
+        ...publicProject(project),
         category: String(p["category"]),
         categorySlug: String(p["categorySlug"]),
         categorySlugs: categories.map((c) => String(c["slug"])),
