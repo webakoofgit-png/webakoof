@@ -29,6 +29,21 @@ CREATE TABLE IF NOT EXISTS portfolio_project_images (
  alt_text VARCHAR(255) NOT NULL DEFAULT '', sort_order INT NOT NULL DEFAULT 0,
  FOREIGN KEY(project_id) REFERENCES portfolio_projects(id) ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS portfolio_website_checks (
+ project_id INT UNSIGNED PRIMARY KEY,
+ url VARCHAR(1000) NOT NULL,
+ state ENUM('unknown','healthy','unavailable') NOT NULL DEFAULT 'unknown',
+ failures INT UNSIGNED NOT NULL DEFAULT 0,
+ successes INT UNSIGNED NOT NULL DEFAULT 0,
+ last_checked_at DATETIME(3) NULL,
+ next_check_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+ changed_at DATETIME(3) NULL,
+ lease_until DATETIME(3) NULL,
+ lease_token VARCHAR(36) NULL,
+ http_status SMALLINT UNSIGNED NULL,
+ last_result TEXT NOT NULL,
+ FOREIGN KEY(project_id) REFERENCES portfolio_projects(id) ON DELETE CASCADE
+);
 CREATE TABLE IF NOT EXISTS blog_categories (
  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(150) NOT NULL, slug VARCHAR(180) NOT NULL UNIQUE,
  description TEXT NOT NULL, status ENUM('active','inactive') NOT NULL DEFAULT 'active',

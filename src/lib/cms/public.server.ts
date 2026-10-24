@@ -3,6 +3,7 @@ import { settingsDefaults } from "./defaults";
 import type { PublicContent } from "./public";
 import { cleanArticle } from "./rich-text.server";
 import { publicProject } from "./availability";
+import { loadWebsiteMonitoring, publicMonitorState } from "./website-monitor.server";
 export async function loadPublicContent(): Promise<PublicContent> {
   if (!cmsEnabled()) {
     const { projects } = await import("@/data/projects");
@@ -24,9 +25,9 @@ export async function loadPublicContent(): Promise<PublicContent> {
       enabled: false,
     };
   }
-  const [projects, articles, pc, bc, sections, settings] = await Promise.all([
+  const [projects, articles, pc, bc, sections, settings, monitoring] = await Promise.all([
     rows(
-      'SELECT p.content,p.category_id,c.name category,c.slug categorySlug FROM portfolio_projects p JOIN portfolio_categories c ON c.id=p.category_id WHERE p.status="published" AND p.slug<>"aurora-botanics" ORDER BY p.created_at DESC',
+      'SELECT p.id,p.content,p.category_id,c.name category,c.slug categorySlug FROM portfolio_projects p JOIN portfolio_categories c ON c.id=p.category_id WHERE p.status="published" AND p.slug<>"aurora-botanics" ORDER BY p.created_at DESC',
     ),
     rows(
       'SELECT p.content,p.published_at,p.updated_at,c.name category FROM blog_posts p JOIN blog_categories c ON c.id=p.category_id WHERE p.status="published" AND p.publish_date<=UTC_DATE() ORDER BY p.publish_date DESC,p.id DESC',
@@ -37,6 +38,7 @@ export async function loadPublicContent(): Promise<PublicContent> {
     ),
     rows("SELECT slug,content FROM homepage_sections"),
     rows("SELECT content FROM website_settings WHERE id=1"),
+    loadWebsiteMonitoring(),
   ]);
   return {
     projects: projects.map((p) => {
@@ -45,6 +47,7 @@ export async function loadPublicContent(): Promise<PublicContent> {
       const categories = pc.filter((c) => ids.has(Number(c["id"])));
       return {
         ...publicProject(project),
+        websiteMonitorState: publicMonitorState(project, monitoring.get(Number(p["id"]))),
         category: String(p["category"]),
         categorySlug: String(p["categorySlug"]),
         categorySlugs: categories.map((c) => String(c["slug"])),

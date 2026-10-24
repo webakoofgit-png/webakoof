@@ -134,3 +134,21 @@ test("legacy Live default is independent of checks and private fields never seri
   });
   expect(JSON.stringify(safe)).toBe('{"slug":"unchanged","liveUrl":"https://example.com"}');
 });
+
+test("automatic observations distinguish reachability from bot protection and unsafe targets", async () => {
+  const resolve = async () => [{ address: "8.8.8.8", family: 4 }];
+  for (const status of [200, 204, 401, 403, 407, 429, 404, 500, 503]) {
+    const observation = await checkWebsite("https://example.com", {
+      resolve,
+      request: async () => ({ status, location: undefined }),
+    });
+    expect(observation.outcome).toBe(
+      status < 300
+        ? "available"
+        : [401, 403, 407, 429].includes(status)
+          ? "inconclusive"
+          : "unavailable",
+    );
+  }
+  expect((await checkWebsite("http://127.0.0.1")).outcome).toBe("inconclusive");
+});

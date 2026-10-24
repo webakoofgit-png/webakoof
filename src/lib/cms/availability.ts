@@ -6,8 +6,15 @@ export const websiteStatuses = {
 } as const;
 export type WebsiteAvailability = keyof typeof websiteStatuses;
 // Missing values are a legacy migration default, never evidence of verification.
-export function isWebsiteLive(project: { websiteAvailability?: string }) {
-  return (project.websiteAvailability ?? "live") === "live";
+export function isWebsiteLive(project: {
+  websiteAvailability?: string;
+  websiteMonitoringEnabled?: boolean;
+  websiteMonitorState?: string;
+}) {
+  return (
+    (project.websiteAvailability ?? "live") === "live" &&
+    (project.websiteMonitoringEnabled === false || project.websiteMonitorState !== "unavailable")
+  );
 }
 export function publicProject<T extends object>(project: T) {
   const {

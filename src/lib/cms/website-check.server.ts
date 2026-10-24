@@ -125,6 +125,12 @@ export async function checkWebsite(
         continue;
       }
       return {
+        outcome:
+          status >= 200 && status < 300
+            ? ("available" as const)
+            : [401, 403, 407, 429].includes(status)
+              ? ("inconclusive" as const)
+              : ("unavailable" as const),
         checkedAt,
         status,
         redirects,
@@ -143,6 +149,9 @@ export async function checkWebsite(
             ? `Connection failed (${code}).`
             : (error as Error).message;
     return {
+      outcome: /blocked|Only public|Invalid URL/.test(result)
+        ? ("inconclusive" as const)
+        : ("unavailable" as const),
       checkedAt,
       status,
       redirects,

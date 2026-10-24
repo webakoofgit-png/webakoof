@@ -72,6 +72,11 @@ export async function api(request: Request) {
       });
     }
     const admin = await requireAdmin(request);
+    if (kind === "website-monitoring" && request.method === "GET") {
+      const value = new URL(request.url).searchParams.get("project");
+      const { monitoringDiagnostics } = await import("./website-monitor.server");
+      return reply(await monitoringDiagnostics(value ? validId(value) : undefined));
+    }
     if (kind === "check-website" && request.method === "POST") {
       await rateLimit("website-check:" + admin.id, 10, 60);
       const data = z.object({ url: z.string().url().max(1000) }).parse(await body(request));
@@ -266,6 +271,20 @@ export async function api(request: Request) {
           if (previous["liveUrl"] !== d.liveUrl && d.lastCheckedAt === previous["lastCheckedAt"]) {
             d.lastCheckedAt = "";
             d.lastCheckResult = "";
+          }
+          if (
+            id &&
+            (previous["liveUrl"] !== d.liveUrl ||
+              (previous["websiteMonitoringEnabled"] ?? true) !== d.websiteMonitoringEnabled ||
+              (previous["websiteAvailability"] ?? "live") !== d.websiteAvailability)
+          ) {
+            try {
+              await connection.execute("DELETE FROM portfolio_website_checks WHERE project_id=?", [
+                validId(id),
+              ]);
+            } catch (error) {
+              if ((error as { code?: string }).code !== "ER_NO_SUCH_TABLE") throw error;
+            }
           }
         }
         if ("category_ids" in d) {

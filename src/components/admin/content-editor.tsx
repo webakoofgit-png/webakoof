@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { api, DataState, Field, ImageField, Tabs, makeSlug, useData, useDirty } from "./shared";
 import { RichEditor } from "./rich-editor";
 import { websiteStatuses } from "@/lib/cms/availability";
+import { WebsiteMonitoring } from "./website-monitoring";
 const projectDefaults = {
   name: "",
   slug: "",
@@ -25,6 +26,7 @@ const projectDefaults = {
   industry: "",
   liveUrl: "",
   websiteAvailability: "live" as const,
+  websiteMonitoringEnabled: true,
   lastCheckedAt: "",
   lastCheckResult: "",
   adminNotes: "",
@@ -432,9 +434,14 @@ function Editor({
                 <fieldset className="adm-field">
                   <legend>Website availability</legend>
                   <p className="adm-help">
-                    Live is the initial default for existing projects, not a verified result. Review
-                    checks and choose the public status manually.
+                    Live allows automatic monitoring to manage the external link. Other statuses are
+                    manual overrides. An initial Live default is not a verified result.
                   </p>
+                  <WebsiteMonitoring
+                    id={id}
+                    enabled={form.websiteMonitoringEnabled}
+                    onChange={(enabled) => change("websiteMonitoringEnabled", enabled)}
+                  />
                   <div className="adm-form-grid">
                     <Field label="Website Availability">
                       <select

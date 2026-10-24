@@ -55,6 +55,7 @@ export const projectSchema = z
     websiteAvailability: z
       .enum(["live", "temporarily_unavailable", "domain_expired", "permanently_offline"])
       .default("live"),
+    websiteMonitoringEnabled: z.boolean().default(true),
     lastCheckedAt: z.union([z.literal(""), z.string().datetime()]).default(""),
     lastCheckResult: text.default(""),
     adminNotes: text.default(""),

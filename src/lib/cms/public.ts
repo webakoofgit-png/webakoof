@@ -7,6 +7,8 @@ export type PublicContent = {
   projects: (Project & {
     featured?: boolean;
     websiteAvailability?: import("./availability").WebsiteAvailability;
+    websiteMonitoringEnabled?: boolean;
+    websiteMonitorState?: import("./website-monitor-state").MonitorState;
     category?: string;
     categorySlug?: string;
     category_ids?: number[];
