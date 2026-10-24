@@ -155,8 +155,8 @@ export function PortfolioPage() {
             </p>
           )}
           <div className="portfolio-grid editorial-projects">
-            {visible.map((p, i) => (
-              <ProjectCard key={p.slug} project={p} featured={filter === "All" && i === 0} />
+            {visible.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
             ))}
           </div>
           {visible.length === 0 && (
@@ -212,7 +212,6 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
             <a className="action" href={p.liveUrl} target="_blank" rel="noreferrer">
               Visit {p.name} <ArrowUpRight size={18} />
             </a>
-            <span>Live website · Opens in a new tab</span>
           </div>
         )}
         {!isWebsiteLive(p) && (

@@ -11,7 +11,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { Action, Heading, Process } from "@/components/shared/page";
-import heroWorkspace from "@/assets/hero-real-workspace.jpg";
 import { services } from "@/data/services";
 import { useContent } from "@/lib/cms/context";
 import { homepageDefaults } from "@/lib/cms/defaults";
@@ -75,10 +74,10 @@ export function HomePage() {
                   <source media="(max-width: 700px)" srcSet={hero.mobileImage} />
                 )}
                 <img
-                  src={content.enabled ? hero.image || hero.mobileImage : heroWorkspace}
+                  src={hero.image || hero.mobileImage}
                   alt={hero.imageAlt}
-                  width={1200}
-                  height={1726}
+                  width={1254}
+                  height={1254}
                   fetchPriority="high"
                 />
               </picture>

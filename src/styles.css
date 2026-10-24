@@ -1039,7 +1039,7 @@ svg {
 }
 .portfolio-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 50px 30px;
   margin-top: 40px;
 }
@@ -1991,12 +1991,9 @@ svg {
 .case-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 18px;
   margin: 22px 0 8px;
-}
-.case-actions > span {
-  color: #626262;
-  font-size: 11px;
 }
 .case-story {
   display: grid;
@@ -2909,6 +2906,9 @@ svg {
   }
 }
 @media (max-width: 1023px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .desktop-nav,
   .header-cta {
     display: none;
@@ -3019,7 +3019,7 @@ svg {
     grid-template-columns: 1fr 1fr;
   }
   .case-actions {
-    align-items: flex-start;
+    align-items: center;
     flex-direction: column;
     gap: 10px;
   }

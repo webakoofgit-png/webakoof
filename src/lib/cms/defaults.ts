@@ -11,9 +11,9 @@ export const homepageDefaults: Record<string, Section> = Object.fromEntries(
       buttonUrl: "/contact",
       secondaryText: "Explore Our Work",
       secondaryUrl: "/portfolio",
-      image: "/cms-seed/hero-real-workspace.jpg",
+      image: "/developer-office-hero.png",
       imageAlt:
-        "Laptop displaying a visual website alongside a notebook, phone and plant on a real workspace desk",
+        "Web developer building a website at a desktop computer in a bright modern office",
     },
     counters: {
       items: [
