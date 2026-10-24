@@ -50,6 +50,7 @@ test("MySQL sector filters, catalogue controls, PDF eligibility, links and mobil
         featured: false,
         image: "/projects/Rockals.png",
         description: "Catalogue verification",
+        catalogue_order: 1,
       },
     });
     expect(initialResponse.ok()).toBeTruthy();
@@ -61,7 +62,7 @@ test("MySQL sector filters, catalogue controls, PDF eligibility, links and mobil
     await page.getByLabel("Category *", { exact: true }).selectOption(String(categoryIds[0]));
     await page.getByLabel("Website URL", { exact: true }).fill("https://example.com/first");
     await page.getByRole("switch").check();
-    await page.getByLabel("Catalogue Order", { exact: true }).fill("1");
+    await expect(page.getByLabel("Catalogue Order", { exact: true })).toHaveCount(0);
     await page.getByLabel("Status", { exact: true }).selectOption("published");
     await page.getByRole("button", { name: "Save Project", exact: true }).click();
     await expect(page.getByText("Project saved successfully.", { exact: true })).toBeVisible();

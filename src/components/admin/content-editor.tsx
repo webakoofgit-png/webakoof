@@ -255,24 +255,6 @@ function Editor({
                       {form.include_in_catalogue ? "ON" : "OFF"}
                     </span>
                   </Field>
-                  <Field
-                    label="Catalogue Order"
-                    hint="Leave blank to use newest first after ordered projects."
-                  >
-                    <input
-                      type="number"
-                      min={0}
-                      max={1000000}
-                      step={1}
-                      value={form.catalogue_order ?? ""}
-                      onChange={(e) =>
-                        change(
-                          "catalogue_order",
-                          e.target.value === "" ? null : Number(e.target.value),
-                        )
-                      }
-                    />
-                  </Field>
                 </>
               )}
               <Field label="Category *">
