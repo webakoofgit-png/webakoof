@@ -6,6 +6,7 @@ import { api, DataState, Field, ImageField, Tabs, makeSlug, useData, useDirty } 
 import { RichEditor } from "./rich-editor";
 import { websiteStatuses } from "@/lib/cms/availability";
 import { WebsiteMonitoring } from "./website-monitoring";
+const websiteTypes = ["Static", "Dynamic", "Ecommerce"];
 const projectDefaults = {
   name: "",
   slug: "",
@@ -110,6 +111,13 @@ function Editor({
   const [tab, setTab] = useState("Basic Info");
   const [busy, setBusy] = useState(false);
   const [checking, setChecking] = useState(false);
+  const normalizedService = form.service
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "")
+    .replace(/website$/, "");
+  const selectedWebsiteType =
+    websiteTypes.find((type) => type.toLowerCase() === normalizedService) || "";
   const warning = useDirty(JSON.stringify(form) !== saved);
   const change = <K extends keyof EditorForm>(key: K, value: EditorForm[K]) =>
     setForm((f) => ({
@@ -507,8 +515,21 @@ function Editor({
                   {area("adminNotes", "Admin Notes (private)")}
                 </fieldset>
                 <div className="adm-form-grid">
-                  {input("service", "Website Type / Service")}
-                  {lines("tags", "Technology Used")}
+                  <Field label="Website Type">
+                    <select
+                      value={selectedWebsiteType}
+                      onChange={(event) => change("service", event.target.value)}
+                    >
+                      <option value="" disabled>
+                        {form.service ? `${form.service} (current)` : "Select website type"}
+                      </option>
+                      {websiteTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
                   {lines("features", "Key Features")}
                 </div>
                 {area("overview", "Project Overview")}
