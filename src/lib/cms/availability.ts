@@ -18,12 +18,14 @@ export function isWebsiteLive(project: {
 }
 export function publicProject<T extends object>(project: T) {
   const {
+    clientName: _clientName,
     adminNotes: _notes,
     lastCheckedAt: _checked,
     lastCheckResult: _result,
     websiteStatusUpdatedAt: _updated,
     ...safe
   } = project as T & {
+    clientName?: string;
     adminNotes?: string;
     lastCheckedAt?: string;
     lastCheckResult?: string;

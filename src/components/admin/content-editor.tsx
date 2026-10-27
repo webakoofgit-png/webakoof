@@ -10,7 +10,6 @@ const websiteTypes = ["Static", "Dynamic", "Ecommerce"];
 const projectDefaults = {
   name: "",
   slug: "",
-  clientName: "",
   category_id: 0,
   category_ids: [],
   description: "",
@@ -246,7 +245,6 @@ function Editor({
                 true,
               )}
               {input("slug", "Slug *", "text", true)}
-              {kind === "portfolio" && input("clientName", "Client Name")}
               {kind === "portfolio" && (
                 <>
                   {input("liveUrl", "Website URL", "url")}

@@ -185,7 +185,11 @@ export async function api(request: Request) {
       );
       return reply(
         result.map((r) => ({
-          ...json<object>(r["content"] || "{}"),
+          ...Object.fromEntries(
+            Object.entries(json<object>(r["content"] || "{}")).filter(
+              ([key]) => kind !== "portfolio" || key !== "clientName",
+            ),
+          ),
           ...r,
           ...(kind === "portfolio" ? { featured: !!r["featured"] } : {}),
           content: undefined,

@@ -184,21 +184,6 @@ export function ProjectDetailPage({ project: p }: { project: PublicContent["proj
         parent={{ label: "Portfolio", to: "/portfolio" }}
       />
       <div className="section-shell">
-        <div className="case-facts">
-          {[
-            ["Industry", p.industry],
-            ["Services", p.service],
-            ["Technology direction", p.tags.join(" / ")],
-            ["Status", p.isConcept === false ? "Published project" : "Design concept"],
-            ...(p.clientName ? [["Client", p.clientName]] : []),
-            ...(p.year ? [["Year", p.year]] : []),
-          ].map(([title, text]) => (
-            <div key={title}>
-              <span>{title}</span>
-              <strong>{text}</strong>
-            </div>
-          ))}
-        </div>
         <img
           className="case-main-image"
           src={p.image}

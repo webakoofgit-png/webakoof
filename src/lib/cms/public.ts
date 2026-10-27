@@ -20,7 +20,6 @@ export type PublicContent = {
     fullDescription?: string;
     coverImage?: string;
     desktopImage?: string;
-    clientName?: string;
     year?: string;
     result?: string;
     gallery?: { url: string; alt: string }[];

@@ -29,7 +29,6 @@ export const projectSchema = z
     featured: z.boolean(),
     include_in_catalogue: z.boolean().default(false),
     catalogue_order: z.number().int().min(0).max(1000000).nullable().default(null),
-    clientName: text.default(""),
     description: text.default(""),
     fullDescription: text.default(""),
     image: url.default(""),
