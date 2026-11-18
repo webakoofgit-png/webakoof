@@ -10,6 +10,19 @@ type ServerEntry = {
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
+const legacyPageRedirects = new Map([
+  ["/portfolio.html", "/portfolio"],
+  ["/work", "/portfolio"],
+  ["/work/", "/portfolio"],
+  ["/category/blog", "/blog"],
+  ["/category/blog/", "/blog"],
+  ["/author/webakoofbypraavigmail-com", "/blog"],
+  ["/author/webakoofbypraavigmail-com/", "/blog"],
+  ["/blog/", "/blog"],
+  ["/how-to-choose-the-right-domain-name", "/blog/how-to-choose-the-right-domain-name"],
+  ["/how-to-choose-the-right-domain-name/", "/blog/how-to-choose-the-right-domain-name"],
+]);
+
 async function getServerEntry(): Promise<ServerEntry> {
   if (!serverEntryPromise) {
     serverEntryPromise = import("@tanstack/react-start/server-entry").then(
@@ -47,6 +60,17 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    if (request.method === "GET" || request.method === "HEAD") {
+      const url = new URL(request.url);
+      const destination = legacyPageRedirects.get(url.pathname);
+      if (destination) {
+        return new Response(null, {
+          status: 301,
+          headers: { Location: destination + url.search },
+        });
+      }
+    }
+
     startWebsiteMonitor();
     try {
       const handler = await getServerEntry();

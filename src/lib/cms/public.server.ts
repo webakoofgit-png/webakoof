@@ -4,10 +4,11 @@ import type { PublicContent } from "./public";
 import { cleanArticle } from "./rich-text.server";
 import { publicProject } from "./availability";
 import { loadWebsiteMonitoring, publicMonitorState } from "./website-monitor.server";
+import { domainNameGuide } from "@/data/domain-name-guide";
 export async function loadPublicContent(): Promise<PublicContent> {
   if (!cmsEnabled()) {
     const { projects } = await import("@/data/projects");
-    const articles: PublicContent["articles"] = [];
+    const articles = [domainNameGuide];
     return {
       projects,
       articles,
@@ -30,7 +31,7 @@ export async function loadPublicContent(): Promise<PublicContent> {
       'SELECT p.id,p.content,p.category_id,c.name category,c.slug categorySlug FROM portfolio_projects p JOIN portfolio_categories c ON c.id=p.category_id WHERE p.status="published" AND p.slug<>"aurora-botanics" ORDER BY p.created_at DESC',
     ),
     rows(
-      'SELECT p.content,p.published_at,p.updated_at,c.name category FROM blog_posts p JOIN blog_categories c ON c.id=p.category_id WHERE p.status="published" AND p.publish_date<=UTC_DATE() ORDER BY p.publish_date DESC,p.id DESC',
+      'SELECT p.slug,p.content,p.published_at,p.updated_at,c.name category FROM blog_posts p JOIN blog_categories c ON c.id=p.category_id WHERE p.status="published" AND p.publish_date<=UTC_DATE() ORDER BY p.publish_date DESC,p.id DESC',
     ),
     rows("SELECT id,name,slug,status FROM portfolio_categories ORDER BY name"),
     rows(
@@ -40,6 +41,7 @@ export async function loadPublicContent(): Promise<PublicContent> {
     rows("SELECT content FROM website_settings WHERE id=1"),
     loadWebsiteMonitoring(),
   ]);
+  const includeDomainNameGuide = !articles.some((a) => a["slug"] === domainNameGuide.slug);
   return {
     projects: projects.map((p) => {
       const project = json<PublicContent["projects"][number]>(p["content"]);
@@ -54,23 +56,31 @@ export async function loadPublicContent(): Promise<PublicContent> {
         categoryNames: categories.map((c) => String(c["name"])),
       };
     }),
-    articles: articles.map((a) => {
-      const article = json<PublicContent["articles"][number]>(a["content"]);
-      return {
-        ...article,
-        ...(article.html ? cleanArticle(article.html) : {}),
-        category: String(a["category"]),
-        ...(a["published_at"]
-          ? { publishedAt: String(a["published_at"]).replace(" ", "T") + "Z" }
-          : {}),
-        updatedAt: String(a["updated_at"]).replace(" ", "T") + "Z",
-      };
-    }),
+    articles: [
+      ...articles.map((a) => {
+        const article = json<PublicContent["articles"][number]>(a["content"]);
+        return {
+          ...article,
+          ...(article.html ? cleanArticle(article.html) : {}),
+          category: String(a["category"]),
+          ...(a["published_at"]
+            ? { publishedAt: String(a["published_at"]).replace(" ", "T") + "Z" }
+            : {}),
+          updatedAt: String(a["updated_at"]).replace(" ", "T") + "Z",
+        };
+      }),
+      ...(includeDomainNameGuide ? [domainNameGuide] : []),
+    ],
     portfolioCategories: pc.filter((c) => c["status"] === "active").map((c) => String(c["name"])),
     portfolioSectors: pc
       .filter((c) => c["status"] === "active")
       .map((c) => ({ name: String(c["name"]), slug: String(c["slug"]) })),
-    blogCategories: bc.map((c) => String(c["name"])),
+    blogCategories: [
+      ...new Set([
+        ...bc.map((c) => String(c["name"])),
+        ...(includeDomainNameGuide ? [domainNameGuide.category] : []),
+      ]),
+    ],
     sections: Object.fromEntries(sections.map((s) => [s["slug"], json(s["content"])])),
     settings: { ...settingsDefaults, ...json<object>(settings[0]?.["content"] || "{}") },
     enabled: true,
