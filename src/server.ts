@@ -12,6 +12,11 @@ let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 const legacyPageRedirects = new Map([
   ["/portfolio.html", "/portfolio"],
+  ["/services.html", "/services"],
+  ["/contact.html", "/contact"],
+  ["/fast-start.html", "/contact"],
+  ["/seo-best-practices-for-2025", "/blog/seo-friendly-website-2026"],
+  ["/seo-best-practices-for-2025/", "/blog/seo-friendly-website-2026"],
   ["/work", "/portfolio"],
   ["/work/", "/portfolio"],
   ["/category/blog", "/blog"],
