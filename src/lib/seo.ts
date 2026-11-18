@@ -1,4 +1,7 @@
-﻿const origin = (import.meta.env["VITE_SITE_URL"] || "https://webakoof.com").replace(/\/$/, "");
+﻿const configuredSiteUrl = import.meta.env["VITE_SITE_URL"]?.trim();
+const origin = (
+  configuredSiteUrl?.startsWith("https://") ? configuredSiteUrl : "https://webakoof.com"
+).replace(/\/$/, "");
 export const absoluteUrl = (path: string) => new URL(path, origin).href;
 export const siteOrigin = origin;
 export function seo(
